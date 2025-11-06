@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digno Açaí 🍧</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Digno Açaí</h1>
+            <p>Monte seu açaí do jeitinho que você gosta!</p>
+        </header>
+
+        <main>
+            <div class="card">
+                <h2>Escolha o tamanho</h2>
+                <div class="options" id="sizes">
+                    <button class="option-btn" data-size="200" data-price="10.00">
+                        <span>200ml</span>
+                        <span>R$ 10,00</span>
+                    </button>
+                    <button class="option-btn" data-size="250" data-price="12.00">
+                        <span>250ml</span>
+                        <span>R$ 12,00</span>
+                    </button>
+                    <button class="option-btn active" data-size="300" data-price="14.00">
+                        <span>300ml</span>
+                        <span>R$ 14,00</span>
+                    </button>
+                    <button class="option-btn" data-size="400" data-price="16.00">
+                        <span>400ml</span>
+                        <span>R$ 16,00</span>
+                    </button>
+                    <button class="option-btn" data-size="500" data-price="18.00">
+                        <span>500ml</span>
+                        <span>R$ 18,00</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Complementos</h2>
+                <div class="options" id="toppings">
+                    <h3>Frutas (opcional)</h3>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="fruta" value="Banana" data-price="0.00">
+                        <span>Banana</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="fruta" value="Uva" data-price="0.00">
+                        <span>Uva</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="fruta" value="Morango" data-price="0.00">
+                        <span>Morango</span>
+                    </label>
+
+                    <h3>Sorvetes (opcional)</h3>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="sorvete" value="Chocolate" data-price="0.00">
+                        <span>Chocolate</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="sorvete" value="Morango" data-price="0.00">
+                        <span>Morango</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="sorvete" value="Creme" data-price="0.00">
+                        <span>Creme</span>
+                    </label>
+
+                    <h3>Complementos</h3>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="topping" value="Leite em Pó" data-price="0.00">
+                        <span>Leite em Pó</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="topping" value="Granola" data-price="0.00">
+                        <span>Granola</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="topping" value="MeM's" data-price="0.00">
+                        <span>MeM's</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="topping" value="Amendoim" data-price="0.00">
+                        <span>Amendoim</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="topping" value="Flocos de arroz" data-price="0.00">
+                        <span>Flocos de arroz</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="topping" value="Cereal" data-price="0.00">
+                        <span>Cereal</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="topping" value="Canudo wafer" data-price="0.00">
+                        <span>Canudo wafer</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="topping" value="Paçoca" data-price="0.00">
+                        <span>Paçoca</span>
+                    </label>
+
+                    <h3>Caldas</h3>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="topping" value="Leite Condensado" data-price="0.00">
+                        <span>Leite Condensado</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="topping" value="Calda de Chocolate" data-price="0.00">
+                        <span>Calda de Chocolate</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="topping" value="Calda de Morango" data-price="0.00">
+                        <span>Calda de Morango</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Observações</h2>
+                <textarea id="notes" placeholder="Alguma observação sobre o seu pedido?" rows="3"></textarea>
+            </div>
+
+            <div class="summary">
+                <div class="total">
+                    <span>Total:</span>
+                    <span id="total-price">R$ 15,00</span>
+                </div>
+                <button id="checkout-btn" class="primary-btn">Finalizar Pedido</button>
+            </div>
+        </main>
+
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <h2>Confirme seu pedido</h2>
+                <div id="order-summary"></div>
+                <div class="modal-buttons">
+                    <button id="cancel-btn" class="secondary-btn">Voltar</button>
+                    <button id="confirm-btn" class="primary-btn">Enviar Pedido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
