@@ -4,6 +4,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
+    transition: all 0.2s ease;
 }
 
 :root {
@@ -207,6 +208,32 @@ header p {
     width: 18px;
     height: 18px;
     cursor: pointer;
+}
+
+.option-checkbox input[type="checkbox"]:checked + span {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.option-checkbox input[type="checkbox"]:disabled + span {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Estilos para mensagens de categoria */
+.category-info {
+    font-size: 0.85em;
+    color: #7f8c8d;
+    margin-top: -10px;
+    margin-bottom: 15px;
+    font-style: italic;
+    transition: color 0.3s ease;
+}
+
+/* Estilo para quando o limite de seleção é atingido */
+.limit-reached {
+    color: #e74c3c;
+    font-weight: 500;
 }
 
 /* Textarea de observações */
