@@ -1,3 +1,37 @@
+/* Info Banner */
+.info-banner {
+    text-align: center;
+    margin: 15px 0;
+    height: 40px;
+    position: relative;
+    overflow: hidden;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.info-message {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    transform: translateY(10px);
+    will-change: opacity, transform;
+}
+
+.info-message.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.info-message span {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: rgba(255, 200, 200, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid rgba(255, 150, 150, 0.2);
+}
+
 /* Estilos Globais */
 * {
     margin: 0;
@@ -139,19 +173,35 @@ header p {
     flex-direction: column;
     gap: 10px;
     margin-bottom: 10px;
+    width: 100%;
 }
 
 .options h3 {
-    margin: 15px 0 10px 0;
+    margin: 20px 0 12px 0;
     color: var(--primary-color);
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    padding-bottom: 5px;
-    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border-color);
+    position: relative;
+    padding-left: 15px;
 }
 
 .options h3:first-child {
     margin-top: 0;
+}
+
+/* Add decorative element to section headers */
+.options h3::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 20px;
+    background: var(--primary-color);
+    border-radius: 3px;
 }
 
 .option-btn {
@@ -179,6 +229,45 @@ header p {
     border-color: var(--primary-color);
 }
 
+/* Premium Barca option style */
+.option-btn[data-size="barca"] {
+    position: relative;
+    background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
+    color: #333;
+    border: 2px solid #ffd700;
+}
+
+.option-btn[data-size="barca"]:hover {
+    background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(255, 183, 0, 0.3);
+}
+
+.option-btn[data-size="barca"].active {
+    background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
+    color: #333;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(255, 183, 0, 0.4);
+    border: 2px solid #ffd700;
+}
+
+/* Add a crown icon to the Barca option */
+.option-btn[data-size="barca"]::before {
+    content: '👑';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 1.2rem;
+    background: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
 .option-btn span:last-child {
     font-size: 0.9rem;
     opacity: 0.8;
@@ -196,6 +285,8 @@ header p {
     margin-bottom: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .option-checkbox:hover {
@@ -224,10 +315,11 @@ header p {
 .category-info {
     font-size: 0.85em;
     color: #7f8c8d;
-    margin-top: -10px;
-    margin-bottom: 15px;
+    margin: -8px 0 15px 15px;
     font-style: italic;
     transition: color 0.3s ease;
+    display: block;
+    line-height: 1.4;
 }
 
 /* Estilo para quando o limite de seleção é atingido */
@@ -313,6 +405,76 @@ textarea:focus {
     background-color: #f3e5f5;
 }
 
+/* Payment Options */
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.payment-option:hover {
+    border-color: var(--primary-color);
+}
+
+.payment-option.selected {
+    border-color: var(--primary-color);
+    background-color: rgba(142, 68, 173, 0.05);
+}
+
+.payment-icon {
+    font-size: 24px;
+    margin-right: 15px;
+    width: 40px;
+    text-align: center;
+}
+
+.payment-details {
+    flex: 1;
+}
+
+.payment-details h3 {
+    margin: 0 0 5px 0;
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.payment-details p {
+    margin: 5px 0 0 0;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.troco-input {
+    margin-top: 10px;
+}
+
+.troco-input label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.troco-input input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
 /* Modal de confirmação */
 .modal {
     display: none;
@@ -372,11 +534,44 @@ textarea:focus {
 }
 
 /* Responsividade */
+/* Responsive adjustments */
+@media (min-width: 480px) {
+    .options {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+    }
+    
+    .options h3 {
+        grid-column: 1 / -1;
+    }
+    
+    .category-info {
+        grid-column: 1 / -1;
+        margin-left: 0;
+    }
+    
+    .option-checkbox {
+        margin-bottom: 0;
+    }
+}
+
 @media (min-width: 768px) {
     .container {
-        max-width: 600px;
-        padding: 20px;
+        max-width: 720px;
+        padding: 25px;
     }
+    
+    .options {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 15px;
+    }
+    
+    .options h3 {
+        font-size: 1.15rem;
+        margin: 25px 0 15px 0;
+    }
+}
     
     .options {
         display: grid;
@@ -392,7 +587,7 @@ textarea:focus {
         width: 90%;
         max-width: 500px;
     }
-}
+
 
 @media (max-width: 480px) {
     .modal-buttons {

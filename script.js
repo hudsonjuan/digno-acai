@@ -29,9 +29,15 @@ let order = {
     toppings: [],
     notes: '',
     total: 14.00,
+    formaPagamento: null,
+    trocoPara: null,
     extras: {
         frutasAdicionais: 0,
         sorvetesAdicionais: 0
+    },
+    payment: {
+        method: null,
+        trocoPara: null
     }
 };
 
@@ -50,6 +56,14 @@ function setupEventListeners() {
             e.preventDefault();
             selectSize(button);
         });
+    });
+    
+    // Botão de finalizar pedido
+    checkoutButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Mostra o modal de pagamento primeiro
+        showPaymentMethodModal();
     });
 
     // Seleção de frutas
@@ -79,13 +93,10 @@ function setupEventListeners() {
         saveToLocalStorage();
     });
 
-    // Botão de finalizar pedido
-    checkoutButton.addEventListener('click', showOrderSummary);
-
-    // Botões do modal
-    confirmButton.addEventListener('click', sendOrder);
-    cancelButton.addEventListener('click', () => {
-        modal.classList.remove('show');
+    // Botões do modal de confirmação do pedido
+    document.getElementById('confirm-order').addEventListener('click', sendOrder);
+    document.getElementById('cancel-order').addEventListener('click', () => {
+        document.getElementById('order-confirm-modal').classList.remove('show');
     });
 }
 
@@ -94,12 +105,15 @@ function selectSize(selectedButton) {
     sizeButtons.forEach(button => button.classList.remove('active'));
     selectedButton.classList.add('active');
     
+    // Atualiza o tamanho e preço do pedido
     order.size = {
-        name: `${selectedButton.dataset.size}ml`,
+        name: selectedButton.dataset.size === 'barca' ? 'Barca de Açaí' : `${selectedButton.dataset.size}ml`,
         price: parseFloat(selectedButton.dataset.price)
     };
     
+    // Atualiza o total e a interface do usuário
     updateTotal();
+    updateUI();
     saveToLocalStorage();
 }
 
@@ -174,19 +188,23 @@ function updateToppings(event) {
 // Atualiza o preço total
 function updateTotal() {
     // Preço base é o preço do tamanho selecionado
-    let total = order.size.price;
+    let total = order.size ? order.size.price : 0;
     
     // Adiciona valor das frutas adicionais (acima de 2)
-    total += order.extras.frutasAdicionais * CONFIG.prices.frutaAdicional;
+    total += (order.extras?.frutasAdicionais || 0) * CONFIG.prices.frutaAdicional;
     
     // Adiciona valor dos sorvetes adicionais (acima de 1)
-    total += order.extras.sorvetesAdicionais * CONFIG.prices.sorveteAdicional;
+    total += (order.extras?.sorvetesAdicionais || 0) * CONFIG.prices.sorveteAdicional;
     
     // Atualiza o total do pedido
     order.total = parseFloat(total.toFixed(2));
     
     // Atualiza o elemento de preço total na interface
-    totalPriceElement.textContent = `R$ ${order.total.toFixed(2).replace('.', ',')}`;
+    if (totalPriceElement) {
+        totalPriceElement.textContent = `R$ ${order.total.toFixed(2).replace('.', ',')}`;
+    }
+    
+    return order.total;
 }
 
 // Atualiza dicas visuais para frutas e sorvetes
@@ -254,8 +272,122 @@ function updateUI() {
     updateVisualHints();
 }
 
+// Mostra o modal de seleção de pagamento
+function showPaymentMethodModal() {
+    const paymentModal = document.getElementById('payment-method-modal');
+    const paymentOptions = document.querySelectorAll('.payment-option');
+    const confirmPaymentBtn = document.getElementById('confirm-payment');
+    const cancelPaymentBtn = document.getElementById('cancel-payment');
+    const trocoInput = document.getElementById('troco-para');
+    
+    // Reset payment selection
+    paymentOptions.forEach(option => {
+        option.classList.remove('selected');
+        const method = option.dataset.method;
+        const details = option.querySelector(`.pix-details, .troco-input`);
+        if (details) details.style.display = 'none';
+    });
+    
+    // Show payment modal
+    paymentModal.classList.add('show');
+    
+    // Handle payment option selection
+    paymentOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            const method = option.dataset.method;
+            
+            // Update UI
+            paymentOptions.forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            
+            // Show/hide details based on selection
+            if (method === 'pix') {
+                document.querySelector('.pix-details').style.display = 'block';
+                const trocoInput = document.querySelector('.troco-input');
+                if (trocoInput) trocoInput.style.display = 'none';
+            } else if (method === 'dinheiro') {
+                const pixDetails = document.querySelector('.pix-details');
+                if (pixDetails) pixDetails.style.display = 'none';
+                document.querySelector('.troco-input').style.display = 'block';
+            }
+            
+            // Enable confirm button
+            confirmPaymentBtn.disabled = false;
+        });
+    });
+    
+    // Handle confirm payment
+    confirmPaymentBtn.addEventListener('click', () => {
+        console.log('Confirm button clicked'); // Debug log
+        const selectedOption = document.querySelector('.payment-option.selected');
+        if (!selectedOption) {
+            alert('Escolha uma forma de pagamento para continuar.');
+            return;
+        }
+        
+        const method = selectedOption.dataset.method;
+        order.payment = order.payment || {};
+        order.payment.method = method;
+        
+        if (method === 'dinheiro') {
+            const valorPago = parseFloat(trocoInput.value);
+            if (isNaN(valorPago) || valorPago < order.total) {
+                alert(`Por favor, informe um valor igual ou maior que R$ ${order.total.toFixed(2).replace('.', ',')}`);
+                return;
+            }
+            order.payment.valorPago = valorPago;
+        } else {
+            order.payment.valorPago = null;
+        }
+        
+        // Salva o pedido
+        saveToLocalStorage();
+        
+        // Fecha o modal de pagamento
+        paymentModal.classList.remove('show');
+        
+        // Prepara e envia a mensagem para o WhatsApp
+        const message = buildOrderMessage();
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/55${CONFIG.whatsappNumber}?text=${encodedMessage}`;
+        
+        console.log('Opening WhatsApp with URL:', whatsappUrl); // Debug log
+        window.open(whatsappUrl, '_blank');
+        
+        // Fecha o modal de confirmação se estiver aberto
+        const confirmModal = document.getElementById('order-confirm-modal');
+        if (confirmModal) {
+            confirmModal.classList.remove('show');
+        }
+    });
+    
+    // Handle cancel payment
+    cancelPaymentBtn.addEventListener('click', () => {
+        paymentModal.classList.remove('show');
+    });
+    
+    // Disable confirm button initially
+    confirmPaymentBtn.disabled = true;
+}
+
 // Mostra o resumo do pedido no modal
-function showOrderSummary() {
+function showOrderSummary(fromPayment = false) {
+    // Se não veio do pagamento e não tem método de pagamento, mostra o modal de pagamento
+    if (!fromPayment && !order.payment.method) {
+        showPaymentMethodModal();
+        return false;
+    }
+    
+    // Se veio do pagamento mas não tem método, não faz nada
+    if (fromPayment && !order.payment.method) {
+        return false;
+    }
+    
+    // Fecha o modal de pagamento se estiver aberto
+    const paymentModal = document.getElementById('payment-method-modal');
+    if (paymentModal) {
+        paymentModal.classList.remove('show');
+    }
     let summaryHTML = `
         <div class="summary-item">
             <span>Tamanho:</span>
@@ -306,8 +438,13 @@ function showOrderSummary() {
     modal.classList.add('show');
 }
 
-// Envia o pedido para o WhatsApp
-function sendOrder() {
+// Constrói a mensagem do pedido
+function buildOrderMessage() {
+    // Verifica se o método de pagamento foi selecionado
+    if (!order.payment || !order.payment.method) {
+        throw new Error('Método de pagamento não selecionado');
+    }
+
     let message = `🍧 *NOVO PEDIDO - Digno Açaí* 🍧
 
 *TAMANHO:* ${order.size.name} (R$ ${order.size.price.toFixed(2).replace('.', ',')})`;
@@ -328,19 +465,30 @@ function sendOrder() {
         message += `\n*OBSERVAÇÕES:* ${order.notes}`;
     }
     
-    message += `\n\n*TOTAL: R$ ${order.total.toFixed(2).replace('.', ',')}*`;
+    // Adiciona informações de pagamento
+    message += `\n\n💳 *FORMA DE PAGAMENTO:* ${order.payment.method === 'pix' ? 'PIX' : 'DINHEIRO'}`;
     
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/55${CONFIG.whatsappNumber}?text=${encodedMessage}`;
+    if (order.payment.method === 'pix') {
+        message += '\n🔑 Chave Pix(CPF): 10787807303';
+    } else if (order.payment.method === 'dinheiro') {
+        if (order.payment.valorPago) {
+            message += `\n💰 Valor a ser pago: R$ ${order.payment.valorPago.toFixed(2).replace('.', ',')}`;
+            const troco = order.payment.valorPago - order.total;
+            if (troco > 0) {
+                message += `\n💵 Troco: R$ ${troco.toFixed(2).replace('.', ',')}`;
+            }
+        }
+    }
     
-    // Abre o WhatsApp
-    window.open(whatsappUrl, '_blank');
+    // Adiciona o total
+    message += `\n\n💰 *TOTAL: R$ ${order.total.toFixed(2).replace('.', ',')}*`;
     
-    // Fecha o modal
-    modal.classList.remove('show');
+    // Adiciona instruções finais
+    message += '\n\n✅ *PEDIDO CONFIRMADO*';
+    message += '\nAguarde a confirmação do estabelecimento.';
     
-    // Limpa o carrinho (opcional)
-    // resetOrder();
+    
+return message;
 }
 
 // Reseta o pedido
@@ -397,5 +545,29 @@ function loadFromLocalStorage() {
     }
 }
 
-// Inicializa o aplicativo
-window.addEventListener('DOMContentLoaded', init);
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+    // Info banner animation
+    function animateInfoBanner() {
+        const messages = document.querySelectorAll('.info-message');
+        let current = 0;
+                
+        setInterval(() => {
+            // Fade out current message
+            messages[current].classList.remove('active');
+                    
+            // Move to next message
+            current = (current + 1) % messages.length;
+                    
+            // Fade in next message
+            setTimeout(() => {
+                messages[current].classList.add('active');
+            }, 500);
+                    
+        }, 3000); // Change message every 3 seconds
+    }
+                
+    // Start the animation
+    animateInfoBanner();
+    init();
+});
