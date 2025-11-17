@@ -545,8 +545,23 @@ function loadFromLocalStorage() {
     }
 }
 
+// Função para esconder a splash screen
+function hideSplashScreen() {
+    const splashScreen = document.getElementById('splash-screen');
+    if (splashScreen) {
+        splashScreen.classList.add('fade-out');
+        
+        // Remove a splash screen do DOM após a animação
+        setTimeout(() => {
+            splashScreen.remove();
+        }, 500); // Tempo da transição
+    }
+}
+
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
+    // Esconde a splash screen após 2 segundos
+    setTimeout(hideSplashScreen, 2000);
     // Info banner animation
     function animateInfoBanner() {
         const messages = document.querySelectorAll('.info-message');

@@ -417,11 +417,55 @@ textarea:focus {
     display: flex;
     align-items: center;
     padding: 15px;
-    border: 2px solid var(--border-color);
-    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 10px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    background: white;
+    transition: all 0.3s ease;
+}
+
+/* Estilo específico para a chave Pix */
+.payment-option[data-method="pix"] .pix-details {
+    background: #f0f8ff;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin: 10px 0 5px;
+    font-size: 14px;
+    text-align: center;
+    word-break: break-word;
+    line-height: 1.5;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.payment-option[data-method="pix"] .payment-details {
+    flex-grow: 1;
+    text-align: left;
+    margin-left: 12px;
+}
+
+.payment-option[data-method="pix"] h3 {
+    text-align: left;
+    margin: 0;
+    width: auto;
+    flex-grow: 1;
+    padding-top: 2px; /* Ajuste fino para alinhamento vertical */
+}
+
+.payment-option[data-method="pix"] strong {
+    display: block;
+    margin: 5px 0;
+    font-size: 1em;
+    color: #2c3e50;
+    word-break: break-word;
+}
+
+.payment-option[data-method="pix"] small {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.85em;
+    color: #7f8c8d;
+    line-height: 1.4;
 }
 
 .payment-option:hover {
@@ -533,29 +577,131 @@ textarea:focus {
     flex: 1;
 }
 
-/* Responsividade */
-/* Responsive adjustments */
-@media (min-width: 480px) {
-    .options {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 12px;
-    }
-    
-    .options h3 {
-        grid-column: 1 / -1;
-    }
-    
-    .category-info {
-        grid-column: 1 / -1;
-        margin-left: 0;
-    }
-    
-    .option-checkbox {
-        margin-bottom: 0;
+/* Splash Screen */
+#splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #5a2ea6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+#splash-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.splash-content {
+    text-align: center;
+    color: white;
+    padding: 20px;
+    max-width: 90%;
+}
+
+.splash-content h1 {
+    font-size: 1.7rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    letter-spacing: -0.5px;
+    padding: 0 10px;
+}
+
+.splash-content p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* Ajustes para telas muito pequenas */
+@media (max-width: 400px) {
+    .splash-content h1 {
+        font-size: 1.5rem;
+        letter-spacing: -0.5px;
     }
 }
 
+/* Ajustes para telas pequenas (até 480px) */
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .info-banner {
+        margin: 10px 0;
+        height: 36px;
+    }
+    
+    .info-message span {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .card {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .option-checkbox {
+        margin: 0;
+        padding: 10px 12px;
+    }
+    
+    #sizes {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    
+    .option-btn {
+        padding: 12px 8px;
+        font-size: 0.9rem;
+    }
+    
+    .summary {
+        padding: 15px;
+        margin-top: 10px;
+    }
+    
+    .total {
+        font-size: 1.1rem;
+    }
+    
+    .primary-btn {
+        padding: 12px 16px;
+        font-size: 1rem;
+    }
+}
+
+/* Ajustes para telas médias (481px - 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+    .options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .options h3, .category-info {
+        grid-column: 1 / -1;
+    }
+    
+    #sizes {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Ajustes para telas grandes (768px+) */
 @media (min-width: 768px) {
     .container {
         max-width: 720px;
@@ -563,31 +709,24 @@ textarea:focus {
     }
     
     .options {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 15px;
     }
     
-    .options h3 {
-        font-size: 1.15rem;
-        margin: 25px 0 15px 0;
-    }
-}
-    
-    .options {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 12px;
+    .options h3, .category-info {
+        grid-column: 1 / -1;
     }
     
     #sizes {
-        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
     
     .modal-content {
         width: 90%;
         max-width: 500px;
     }
-
+}
 
 @media (max-width: 480px) {
     .modal-buttons {
