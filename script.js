@@ -1,6 +1,6 @@
 // Configurações
 const CONFIG = {
-    whatsappNumber: '5598984425355',
+    whatsappNumber: '5598985780249',
     maxToppings: Infinity,
     prices: {
         frutaAdicional: 1.00,    // R$ 1,00 por fruta adicional (acima de 2)
