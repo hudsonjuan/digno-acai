@@ -244,11 +244,12 @@ header p {
 }
 
 .option-btn[data-size="barca"].active {
-    background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
-    color: #333;
+    background: linear-gradient(135deg, #d4af37 0%, #f9d423 100%);
+    color: #2c3e50;
     transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(255, 183, 0, 0.4);
-    border: 2px solid #ffd700;
+    box-shadow: 0 10px 20px rgba(212, 175, 55, 0.4);
+    border: 2px solid #d4af37;
+    font-weight: 500;
 }
 
 /* Add a crown icon to the Barca option */
