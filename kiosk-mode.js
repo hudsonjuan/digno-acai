@@ -42,14 +42,28 @@ function initKioskMode() {
     applyKioskStyles();
     setupKioskEventListeners();
     
-    // Always reset the kiosk on init to ensure clean state
-    resetKiosk();
-    
-    // Check for existing customer name in session (defensive check)
+    // Check for existing customer name in session
     KIOSK_CONFIG.customerName = sessionStorage.getItem('customerName');
     
-    // Always show the customer name overlay to start fresh
-    showCustomerNameOverlay();
+    // If we're coming back from WhatsApp, ensure clean state
+    const referrer = document.referrer;
+    if (referrer && referrer.includes('whatsapp')) {
+        // Clear any stored order data
+        if (localStorage) {
+            localStorage.removeItem('acaiOrder');
+        }
+        // Force show the customer name overlay
+        KIOSK_CONFIG.customerName = null;
+        sessionStorage.removeItem('customerName');
+    }
+    
+    // Always show the customer name overlay to start fresh if no name is set
+    if (!KIOSK_CONFIG.customerName) {
+        showCustomerNameOverlay();
+    }
+    
+    // Reset any UI states
+    resetKiosk();
     
     // Start inactivity timer
     resetInactivityTimer();
@@ -293,19 +307,24 @@ function setupKioskEventListeners() {
         };
     }
     
-    // Override the WhatsApp redirection to reset kiosk first
-    if (typeof window.open === 'function') {
+    // Override the WhatsApp redirection to force page reload after sending
+    if (typeof window.open === 'function' && KIOSK_CONFIG.isKioskMode) {
         const originalOpen = window.open;
         window.open = function(url, target, features) {
-            if (KIOSK_CONFIG.isKioskMode && url && url.includes('wa.me')) {
-                // Save the URL to open after reset
+            if (url && url.includes('wa.me')) {
+                // Save the URL to open
                 const whatsappUrl = url;
                 
-                // Reset the kiosk first
-                resetKiosk();
+                // Clear all kiosk-related data
+                sessionStorage.removeItem('customerName');
                 
-                // Then open WhatsApp
-                return originalOpen.call(window, whatsappUrl, target, features);
+                // Open WhatsApp in a new tab
+                const newWindow = originalOpen.call(window, whatsappUrl, '_blank');
+                
+                // Force page reload to reset all states
+                window.location.href = window.location.pathname + '?kiosk=1';
+                
+                return newWindow;
             }
             return originalOpen.apply(window, arguments);
         };
@@ -351,6 +370,19 @@ function resetKiosk() {
     
     // Reset any other kiosk state
     KIOSK_CONFIG.isResetting = false;
+    
+    // Force UI reset if we're in kiosk mode
+    if (KIOSK_CONFIG.isKioskMode) {
+        // Remove any active/selected states from buttons and inputs
+        document.querySelectorAll('.active, .selected, .checked').forEach(el => {
+            el.classList.remove('active', 'selected', 'checked');
+        });
+        
+        // Uncheck all checkboxes and radio buttons
+        document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(input => {
+            input.checked = false;
+        });
+    }
 }
 
 function resetInactivityTimer() {
