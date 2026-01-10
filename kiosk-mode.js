@@ -5,8 +5,31 @@ const KIOSK_CONFIG = {
     isKioskMode: new URLSearchParams(window.location.search).get('kiosk') === '1',
     inactivityTimer: null,
     resetTimer: null,
-    customerName: null
+    customerName: null,
+    isScrollLocked: false
 };
+
+/**
+ * Lock scrolling on the page
+ */
+function lockScroll() {
+    if (KIOSK_CONFIG.isKioskMode && !KIOSK_CONFIG.isScrollLocked) {
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+        KIOSK_CONFIG.isScrollLocked = true;
+    }
+}
+
+/**
+ * Unlock scrolling on the page
+ */
+function unlockScroll() {
+    if (KIOSK_CONFIG.isKioskMode && KIOSK_CONFIG.isScrollLocked) {
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+        KIOSK_CONFIG.isScrollLocked = false;
+    }
+}
 
 /**
  * Initialize kiosk mode if kiosk parameter is present
@@ -53,13 +76,12 @@ function applyKioskStyles() {
             outline: none !important;
         }
         
-        /* Disable zooming and scrolling */
+        /* Initial scroll state - will be controlled by JavaScript */
         html, body {
             touch-action: manipulation;
-            overflow: hidden;
-            position: fixed;
+            position: relative;
             width: 100%;
-            height: 100%;
+            min-height: 100%;
         }
         
         /* Customer name overlay */
@@ -143,6 +165,9 @@ function applyKioskStyles() {
  * Show customer name overlay
  */
 function showCustomerNameOverlay() {
+    // Lock scrolling when overlay is shown
+    lockScroll();
+    
     // Create overlay if it doesn't exist
     let overlay = document.getElementById('kiosk-overlay');
     if (!overlay) {
@@ -189,6 +214,8 @@ function hideCustomerNameOverlay() {
     const overlay = document.getElementById('kiosk-overlay');
     if (overlay) {
         overlay.style.display = 'none';
+        // Unlock scrolling when overlay is hidden
+        unlockScroll();
     }
 }
 
