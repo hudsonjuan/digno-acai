@@ -1,12 +1,13 @@
 // Kiosk Mode Configuration
 const KIOSK_CONFIG = {
     inactivityTimeout: 90 * 1000, // 90 seconds in milliseconds
-    resetDelay: 3000, // 3 seconds to show reset message
+    resetDelay: 5000, // 5 seconds fallback reset delay
     isKioskMode: new URLSearchParams(window.location.search).get('kiosk') === '1',
     inactivityTimer: null,
     resetTimer: null,
     customerName: null,
-    isScrollLocked: false
+    isScrollLocked: false,
+    isResetting: false
 };
 
 /**
@@ -41,15 +42,14 @@ function initKioskMode() {
     applyKioskStyles();
     setupKioskEventListeners();
     
-    // Check for existing customer name in session
+    // Always reset the kiosk on init to ensure clean state
+    resetKiosk();
+    
+    // Check for existing customer name in session (defensive check)
     KIOSK_CONFIG.customerName = sessionStorage.getItem('customerName');
     
-    if (!KIOSK_CONFIG.customerName) {
-        showCustomerNameOverlay();
-    } else {
-        // If returning with a name, ensure the overlay is hidden
-        hideCustomerNameOverlay();
-    }
+    // Always show the customer name overlay to start fresh
+    showCustomerNameOverlay();
     
     // Start inactivity timer
     resetInactivityTimer();
@@ -293,6 +293,24 @@ function setupKioskEventListeners() {
         };
     }
     
+    // Override the WhatsApp redirection to reset kiosk first
+    if (typeof window.open === 'function') {
+        const originalOpen = window.open;
+        window.open = function(url, target, features) {
+            if (KIOSK_CONFIG.isKioskMode && url && url.includes('wa.me')) {
+                // Save the URL to open after reset
+                const whatsappUrl = url;
+                
+                // Reset the kiosk first
+                resetKiosk();
+                
+                // Then open WhatsApp
+                return originalOpen.call(window, whatsappUrl, target, features);
+            }
+            return originalOpen.apply(window, arguments);
+        };
+    }
+    
     // Handle order completion
     if (typeof window.resetOrder === 'function') {
         const originalResetOrder = window.resetOrder;
@@ -308,6 +326,33 @@ function setupKioskEventListeners() {
 /**
  * Reset the inactivity timer
  */
+/**
+ * Reset the kiosk to initial state
+ */
+function resetKiosk() {
+    if (KIOSK_CONFIG.isResetting) return;
+    KIOSK_CONFIG.isResetting = true;
+    
+    // Clear any existing timers
+    if (KIOSK_CONFIG.inactivityTimer) {
+        clearTimeout(KIOSK_CONFIG.inactivityTimer);
+        KIOSK_CONFIG.inactivityTimer = null;
+    }
+    
+    // Reset customer name and session storage
+    KIOSK_CONFIG.customerName = null;
+    sessionStorage.removeItem('customerName');
+    
+    // Show the customer name overlay
+    showCustomerNameOverlay();
+    
+    // Reset scroll to top
+    window.scrollTo(0, 0);
+    
+    // Reset any other kiosk state
+    KIOSK_CONFIG.isResetting = false;
+}
+
 function resetInactivityTimer() {
     if (!KIOSK_CONFIG.isKioskMode) return;
     
@@ -316,8 +361,7 @@ function resetInactivityTimer() {
     }
     
     KIOSK_CONFIG.inactivityTimer = setTimeout(() => {
-        showResetMessage();
-        window.scrollTo(0, 0);
+        resetKiosk();
         
         // Show a message (optional)
         if (typeof showNotification === 'function') {
