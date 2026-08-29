@@ -44,10 +44,20 @@ function initializeSupabase() {
     console.log('Admin: supabaseUrl:', ADMIN_CONFIG.supabaseUrl);
     console.log('Admin: supabaseAnonKey:', ADMIN_CONFIG.supabaseAnonKey ? 'Configurada' : 'Não configurada');
     
-    if (typeof createClient === 'function' && ADMIN_CONFIG.supabaseUrl && ADMIN_CONFIG.supabaseAnonKey) {
+    // Use existing window.supabase if available, otherwise create new client
+    if (typeof window.supabase === 'object' && ADMIN_CONFIG.supabaseUrl && ADMIN_CONFIG.supabaseAnonKey) {
+        console.log('Admin: Usando window.supabase existente');
+        // Reinitialize with correct credentials if needed
+        const cleanSupabaseUrl = ADMIN_CONFIG.supabaseUrl.replace(/\/rest\/v1\/?$/, '');
+        if (typeof createClient === 'function') {
+            console.log('Admin: Recriando cliente com credenciais corretas');
+            window.supabase = createClient(cleanSupabaseUrl, ADMIN_CONFIG.supabaseAnonKey);
+        }
+        console.log('Admin: Supabase client pronto');
+    } else if (typeof createClient === 'function' && ADMIN_CONFIG.supabaseUrl && ADMIN_CONFIG.supabaseAnonKey) {
         // Remove /rest/v1/ se estiver presente na URL
         const cleanSupabaseUrl = ADMIN_CONFIG.supabaseUrl.replace(/\/rest\/v1\/?$/, '');
-        console.log('Admin: Supabase URL original:', ADMIN_CONFIG.supabaseUrl);
+        console.log('Admin: Criando novo cliente Supabase');
         console.log('Admin: Supabase URL limpa:', cleanSupabaseUrl);
         window.supabase = createClient(cleanSupabaseUrl, ADMIN_CONFIG.supabaseAnonKey);
         console.log('Admin: Supabase client inicializado com sucesso');
