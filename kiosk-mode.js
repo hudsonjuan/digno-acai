@@ -348,8 +348,8 @@ function setupKioskEventListeners() {
                         unitPrice: window.order.size.price
                     }],
                     total: window.order.total,
-                    paymentMethod: window.order.payment.method,
-                    paymentDetails: window.order.payment.method === 'dinheiro' ? {
+                    paymentMethod: window.order.payment?.method || 'pix', // Default to pix if not set
+                    paymentDetails: window.order.payment?.method === 'dinheiro' ? {
                         valorPago: window.order.payment.valorPago
                     } : null,
                     origin: 'kiosk',
