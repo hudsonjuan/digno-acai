@@ -19,8 +19,8 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { id } = event.pathParameters;
     const body = JSON.parse(event.body);
+    const { id } = body;
 
     // Validação
     if (!id) {

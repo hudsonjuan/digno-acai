@@ -323,10 +323,10 @@ async function handleAction(orderId, action) {
 
 async function updateOrderStatus(orderId, status) {
     try {
-        const response = await fetch(`/.netlify/functions/update-status/${orderId}`, {
+        const response = await fetch(`/.netlify/functions/update-status`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status, cancelledBy: currentUser?.email })
+            body: JSON.stringify({ id: orderId, status, cancelledBy: currentUser?.email })
         });
         
         const result = await response.json();
