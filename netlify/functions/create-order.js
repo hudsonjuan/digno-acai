@@ -81,7 +81,8 @@ exports.handler = async (event) => {
 
     if (insertError) {
       console.error('Erro ao inserir pedido:', insertError);
-      throw new Error('Erro ao salvar pedido no banco');
+      console.error('Detalhes do erro:', JSON.stringify(insertError, null, 2));
+      throw new Error(`Erro ao salvar pedido no banco: ${insertError.message}`);
     }
 
     // Retorna o pedido criado
