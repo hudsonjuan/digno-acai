@@ -1,10 +1,13 @@
 const { createClient } = require('@supabase/supabase-js');
 
 // Inicializa cliente Supabase
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Remove /rest/v1/ se estiver presente na URL
+const cleanSupabaseUrl = supabaseUrl.replace(/\/rest\/v1\/?$/, '');
+
+const supabase = createClient(cleanSupabaseUrl, supabaseKey);
 
 exports.handler = async (event) => {
   // Apenas permite PATCH
