@@ -4,8 +4,7 @@
   "description": "Sistema de pedidos para Digno Açaí",
   "main": "index.html",
   "scripts": {
-    "dev": "netlify dev",
-    "build": "netlify build"
+    "dev": "netlify dev"
   },
   "keywords": [
     "acai",
