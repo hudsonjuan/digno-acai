@@ -346,13 +346,21 @@ function showPaymentMethodModal() {
         // Fecha o modal de pagamento
         paymentModal.classList.remove('show');
         
-        // Prepara e envia a mensagem para o WhatsApp
-        const message = buildOrderMessage();
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl = `https://wa.me/55${CONFIG.whatsappNumber}?text=${encodedMessage}`;
+        // Verifica se está em modo kiosk
+        const isKioskMode = new URLSearchParams(window.location.search).get('kiosk') === '1' || new URLSearchParams(window.location.search).get('kiosk') === 'true';
         
-        console.log('Opening WhatsApp with URL:', whatsappUrl); // Debug log
-        window.open(whatsappUrl, '_blank');
+        if (isKioskMode) {
+            // Em modo kiosk, não envia para WhatsApp (o kiosk-mode.js já trata isso)
+            console.log('Kiosk mode detected - skipping WhatsApp redirect');
+        } else {
+            // Prepara e envia a mensagem para o WhatsApp (modo normal)
+            const message = buildOrderMessage();
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/55${CONFIG.whatsappNumber}?text=${encodedMessage}`;
+            
+            console.log('Opening WhatsApp with URL:', whatsappUrl); // Debug log
+            window.open(whatsappUrl, '_blank');
+        }
         
         // Fecha o modal de confirmação se estiver aberto
         const confirmModal = document.getElementById('order-confirm-modal');
