@@ -41,6 +41,9 @@ let order = {
     }
 };
 
+// Expose order globally for kiosk mode
+window.order = order;
+
 // Inicialização
 function init() {
     loadFromLocalStorage();
