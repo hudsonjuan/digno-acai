@@ -39,28 +39,11 @@ async function loadConfig() {
 
 function initializeSupabase() {
     console.log('Admin: Verificando configuração Supabase...');
-    console.log('Admin: typeof createClient:', typeof createClient);
-    console.log('Admin: typeof window.supabase:', typeof window.supabase);
     console.log('Admin: supabaseUrl:', ADMIN_CONFIG.supabaseUrl);
     console.log('Admin: supabaseAnonKey:', ADMIN_CONFIG.supabaseAnonKey ? 'Configurada' : 'Não configurada');
     
-    // Use existing window.supabase if available, otherwise create new client
-    if (typeof window.supabase === 'object' && ADMIN_CONFIG.supabaseUrl && ADMIN_CONFIG.supabaseAnonKey) {
-        console.log('Admin: Usando window.supabase existente');
-        // Reinitialize with correct credentials if needed
-        const cleanSupabaseUrl = ADMIN_CONFIG.supabaseUrl.replace(/\/rest\/v1\/?$/, '');
-        if (typeof createClient === 'function') {
-            console.log('Admin: Recriando cliente com credenciais corretas');
-            window.supabase = createClient(cleanSupabaseUrl, ADMIN_CONFIG.supabaseAnonKey);
-        }
-        console.log('Admin: Supabase client pronto');
-    } else if (typeof createClient === 'function' && ADMIN_CONFIG.supabaseUrl && ADMIN_CONFIG.supabaseAnonKey) {
-        // Remove /rest/v1/ se estiver presente na URL
-        const cleanSupabaseUrl = ADMIN_CONFIG.supabaseUrl.replace(/\/rest\/v1\/?$/, '');
-        console.log('Admin: Criando novo cliente Supabase');
-        console.log('Admin: Supabase URL limpa:', cleanSupabaseUrl);
-        window.supabase = createClient(cleanSupabaseUrl, ADMIN_CONFIG.supabaseAnonKey);
-        console.log('Admin: Supabase client inicializado com sucesso');
+    if (ADMIN_CONFIG.supabaseUrl && ADMIN_CONFIG.supabaseAnonKey) {
+        console.log('Admin: Configuração OK, usando API REST diretamente');
     } else {
         console.error('Supabase configuration not found');
         console.error('supabaseUrl:', ADMIN_CONFIG.supabaseUrl);
@@ -174,17 +157,25 @@ function stopAutoRefresh() {
 }
 
 async function loadOrders() {
-    if (!window.supabase) return;
+    if (!ADMIN_CONFIG.supabaseUrl || !ADMIN_CONFIG.supabaseAnonKey) {
+        console.error('Admin: Supabase config not available');
+        return;
+    }
     
     try {
-        const { data, error } = await window.supabase
-            .from('orders')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(100);
+        const cleanUrl = ADMIN_CONFIG.supabaseUrl.replace(/\/rest\/v1\/?$/, '');
+        const response = await fetch(`${cleanUrl}/rest/v1/orders?select=*&order=created_at.desc&limit=100`, {
+            headers: {
+                'apikey': ADMIN_CONFIG.supabaseAnonKey,
+                'Authorization': `Bearer ${ADMIN_CONFIG.supabaseAnonKey}`
+            }
+        });
         
-        if (error) throw error;
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
+        const data = await response.json();
         orders = data || [];
         
         // Check for new orders
