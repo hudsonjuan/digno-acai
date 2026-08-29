@@ -1,7 +1,7 @@
 // Admin Panel Configuration
 const ADMIN_CONFIG = {
-    supabaseUrl: process.env.SUPABASE_URL || window.SUPABASE_URL,
-    supabaseAnonKey: process.env.SUPABASE_ANON_KEY || window.SUPABASE_ANON_KEY,
+    supabaseUrl: null,
+    supabaseAnonKey: null,
     soundEnabled: true,
     refreshInterval: 5000, // 5 seconds for polling
     lastOrderCount: 0
@@ -20,11 +20,23 @@ const loginForm = document.getElementById('login-form');
 const loginError = document.getElementById('login-error');
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadConfig();
     initializeSupabase();
     checkAuth();
     setupEventListeners();
 });
+
+async function loadConfig() {
+    try {
+        const response = await fetch('/.netlify/functions/get-config');
+        const data = await response.json();
+        ADMIN_CONFIG.supabaseUrl = data.SUPABASE_URL;
+        ADMIN_CONFIG.supabaseAnonKey = data.SUPABASE_ANON_KEY;
+    } catch (error) {
+        console.error('Error loading config:', error);
+    }
+}
 
 function initializeSupabase() {
     if (typeof createClient === 'function' && ADMIN_CONFIG.supabaseUrl && ADMIN_CONFIG.supabaseAnonKey) {
