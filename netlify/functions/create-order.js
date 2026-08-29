@@ -1,10 +1,17 @@
 const { createClient } = require('@supabase/supabase-js');
 
 // Inicializa cliente Supabase
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Verifica se as variáveis de ambiente estão configuradas
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Variáveis de ambiente do Supabase não configuradas');
+  console.error('SUPABASE_URL:', supabaseUrl ? 'Configurada' : 'Não configurada');
+  console.error('SUPABASE_SERVICE_ROLE_KEY:', supabaseKey ? 'Configurada' : 'Não configurada');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async (event) => {
   // Apenas permite POST
