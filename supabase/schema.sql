@@ -83,11 +83,11 @@ CREATE POLICY "Allow insert orders"
     TO anon, authenticated
     WITH CHECK (true);
 
--- Política para permitir leitura de pedidos (apenas autenticados para admin)
+-- Política para permitir leitura de pedidos (anon e authenticated para admin)
 CREATE POLICY "Allow select orders for authenticated"
     ON orders
     FOR SELECT
-    TO authenticated
+    TO anon, authenticated
     USING (true);
 
 -- Política para permitir atualização de status (apenas autenticados para admin)
