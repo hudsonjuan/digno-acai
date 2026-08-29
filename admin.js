@@ -38,12 +38,19 @@ async function loadConfig() {
 }
 
 function initializeSupabase() {
+    console.log('Admin: Verificando configuração Supabase...');
+    console.log('Admin: typeof createClient:', typeof createClient);
+    console.log('Admin: typeof window.supabase:', typeof window.supabase);
+    console.log('Admin: supabaseUrl:', ADMIN_CONFIG.supabaseUrl);
+    console.log('Admin: supabaseAnonKey:', ADMIN_CONFIG.supabaseAnonKey ? 'Configurada' : 'Não configurada');
+    
     if (typeof createClient === 'function' && ADMIN_CONFIG.supabaseUrl && ADMIN_CONFIG.supabaseAnonKey) {
         // Remove /rest/v1/ se estiver presente na URL
         const cleanSupabaseUrl = ADMIN_CONFIG.supabaseUrl.replace(/\/rest\/v1\/?$/, '');
         console.log('Admin: Supabase URL original:', ADMIN_CONFIG.supabaseUrl);
         console.log('Admin: Supabase URL limpa:', cleanSupabaseUrl);
         window.supabase = createClient(cleanSupabaseUrl, ADMIN_CONFIG.supabaseAnonKey);
+        console.log('Admin: Supabase client inicializado com sucesso');
     } else {
         console.error('Supabase configuration not found');
         console.error('supabaseUrl:', ADMIN_CONFIG.supabaseUrl);
