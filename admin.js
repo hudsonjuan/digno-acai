@@ -164,6 +164,8 @@ async function loadOrders() {
     
     try {
         const cleanUrl = ADMIN_CONFIG.supabaseUrl.replace(/\/rest\/v1\/?$/, '');
+        console.log('Admin: Fetching orders from:', `${cleanUrl}/rest/v1/orders`);
+        
         const response = await fetch(`${cleanUrl}/rest/v1/orders?select=*&order=created_at.desc&limit=100`, {
             headers: {
                 'apikey': ADMIN_CONFIG.supabaseAnonKey,
@@ -176,7 +178,9 @@ async function loadOrders() {
         }
         
         const data = await response.json();
+        console.log('Admin: Orders received:', data);
         orders = data || [];
+        console.log('Admin: Orders array length:', orders.length);
         
         // Check for new orders
         const currentCount = orders.filter(o => o.status === 'new').length;
@@ -185,6 +189,7 @@ async function loadOrders() {
         }
         ADMIN_CONFIG.lastOrderCount = currentCount;
         
+        console.log('Admin: Calling renderOrders');
         renderOrders();
         updateStats();
         
