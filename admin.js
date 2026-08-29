@@ -7,8 +7,7 @@ const ADMIN_CONFIG = {
     lastOrderCount: 0
 };
 
-// Initialize Supabase client
-let supabase = null;
+// Initialize Supabase client (will be set in initializeSupabase)
 let currentUser = null;
 let orders = [];
 let refreshTimer = null;
@@ -44,7 +43,7 @@ function initializeSupabase() {
         const cleanSupabaseUrl = ADMIN_CONFIG.supabaseUrl.replace(/\/rest\/v1\/?$/, '');
         console.log('Admin: Supabase URL original:', ADMIN_CONFIG.supabaseUrl);
         console.log('Admin: Supabase URL limpa:', cleanSupabaseUrl);
-        supabase = createClient(cleanSupabaseUrl, ADMIN_CONFIG.supabaseAnonKey);
+        window.supabase = createClient(cleanSupabaseUrl, ADMIN_CONFIG.supabaseAnonKey);
     } else {
         console.error('Supabase configuration not found');
         console.error('supabaseUrl:', ADMIN_CONFIG.supabaseUrl);
@@ -158,10 +157,10 @@ function stopAutoRefresh() {
 }
 
 async function loadOrders() {
-    if (!supabase) return;
+    if (!window.supabase) return;
     
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabase
             .from('orders')
             .select('*')
             .order('created_at', { ascending: false })
