@@ -324,6 +324,7 @@ function setupKioskEventListeners() {
                 
                 newBtn.addEventListener('click', async function(e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     console.log('Kiosk mode: Confirm button clicked');
                     
                     const selectedOption = document.querySelector('.payment-option.selected');
@@ -334,8 +335,10 @@ function setupKioskEventListeners() {
                     
                     const method = selectedOption.dataset.method;
                     console.log('Kiosk mode: Payment method:', method);
+                    console.log('Kiosk mode: window.order exists?', typeof window.order !== 'undefined');
                     
                     if (typeof window.order !== 'undefined') {
+                        console.log('Kiosk mode: window.order:', window.order);
                         window.order.payment = window.order.payment || {};
                         window.order.payment.method = method;
                         
@@ -351,9 +354,12 @@ function setupKioskEventListeners() {
                             window.order.payment.valorPago = null;
                         }
                         
-                        console.log('Kiosk mode: Sending order to API');
+                        console.log('Kiosk mode: Calling sendOrderToAPI');
+                        console.log('Kiosk mode: sendOrderToAPI exists?', typeof sendOrderToAPI);
                         // Send order to API instead of WhatsApp
                         await sendOrderToAPI();
+                    } else {
+                        console.error('Kiosk mode: window.order is not defined!');
                     }
                 });
             }

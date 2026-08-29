@@ -94,7 +94,10 @@ function setupEventListeners() {
     });
 
     // Botões do modal de confirmação do pedido
-    document.getElementById('confirm-order').addEventListener('click', sendOrder);
+    const confirmOrderBtn = document.getElementById('confirm-order');
+    if (confirmOrderBtn) {
+        confirmOrderBtn.addEventListener('click', showPaymentMethodModal);
+    }
     document.getElementById('cancel-order').addEventListener('click', () => {
         document.getElementById('order-confirm-modal').classList.remove('show');
     });
@@ -211,19 +214,21 @@ function updateTotal() {
 function updateVisualHints() {
     // Atualiza dicas visuais para frutas
     const frutasSelecionadas = order.frutas.length;
-    const frutasInfo = document.querySelector('h3:contains("Frutas")').nextElementSibling;
+    const frutasInfo = Array.from(document.querySelectorAll('h3')).find(h => h.textContent.includes('Frutas'))?.nextElementSibling;
     
-    if (frutasSelecionadas > 2) {
-        frutasInfo.textContent = `Até 2 frutas inclusas. +R$ ${(frutasSelecionadas - 2) * CONFIG.prices.frutaAdicional} em frutas adicionais.`;
-        frutasInfo.style.color = '#e74c3c';
-    } else {
-        frutasInfo.textContent = 'Até 2 frutas inclusas. R$ 1,00 por fruta adicional.';
-        frutasInfo.style.color = '';
+    if (frutasInfo) {
+        if (frutasSelecionadas > 2) {
+            frutasInfo.textContent = `Até 2 frutas inclusas. +R$ ${(frutasSelecionadas - 2) * CONFIG.prices.frutaAdicional} em frutas adicionais.`;
+            frutasInfo.style.color = '#e74c3c';
+        } else {
+            frutasInfo.textContent = 'Até 2 frutas inclusas. R$ 1,00 por fruta adicional.';
+            frutasInfo.style.color = '';
+        }
     }
     
     // Atualiza dicas visuais para sorvetes
     const sorvetesSelecionados = order.sorvetes.length;
-    const sorvetesInfo = document.querySelector('h3:contains("Sorvetes")').nextElementSibling;
+    const sorvetesInfo = Array.from(document.querySelectorAll('h3')).find(h => h.textContent.includes('Sorvetes'))?.nextElementSibling;
     
     if (sorvetesSelecionados > 1) {
         sorvetesInfo.textContent = `1 incluso. +R$ ${(sorvetesSelecionados - 1) * CONFIG.prices.sorveteAdicional} em sorvetes adicionais.`;
