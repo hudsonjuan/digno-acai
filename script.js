@@ -322,7 +322,7 @@ function showPaymentMethodModal() {
     });
     
     // Handle confirm payment
-    confirmPaymentBtn.addEventListener('click', () => {
+    confirmPaymentBtn.addEventListener('click', async () => {
         console.log('Confirm button clicked'); // Debug log
         const selectedOption = document.querySelector('.payment-option.selected');
         if (!selectedOption) {
@@ -355,8 +355,14 @@ function showPaymentMethodModal() {
         const isKioskMode = new URLSearchParams(window.location.search).get('kiosk') === '1' || new URLSearchParams(window.location.search).get('kiosk') === 'true';
         
         if (isKioskMode) {
-            // Em modo kiosk, não envia para WhatsApp (o kiosk-mode.js já trata isso)
-            console.log('Kiosk mode detected - skipping WhatsApp redirect');
+            // Em modo kiosk, chama a função do kiosk-mode.js
+            console.log('Kiosk mode detected - calling kioskSendOrder');
+            if (typeof window.kioskSendOrder === 'function') {
+                await window.kioskSendOrder();
+            } else {
+                console.error('Kiosk mode: kioskSendOrder function not found!');
+                alert('Erro ao enviar pedido. Tente novamente.');
+            }
         } else {
             // Prepara e envia a mensagem para o WhatsApp (modo normal)
             const message = buildOrderMessage();

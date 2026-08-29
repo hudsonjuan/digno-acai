@@ -311,61 +311,83 @@ function setupKioskEventListeners() {
     if (KIOSK_CONFIG.isKioskMode) {
         console.log('Kiosk mode: Setting up API integration');
         
-        // Wait for the payment modal to be created
-        const observer = new MutationObserver((mutations) => {
-            const confirmPaymentBtn = document.getElementById('confirm-payment');
-            if (confirmPaymentBtn && !confirmPaymentBtn.dataset.kioskSetup) {
-                console.log('Kiosk mode: Found confirm button, setting up API integration');
-                confirmPaymentBtn.dataset.kioskSetup = 'true';
-                
-                // Remove existing listeners by cloning
-                const newBtn = confirmPaymentBtn.cloneNode(true);
-                confirmPaymentBtn.parentNode.replaceChild(newBtn, confirmPaymentBtn);
-                
-                newBtn.addEventListener('click', async function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Kiosk mode: Confirm button clicked');
-                    
-                    const selectedOption = document.querySelector('.payment-option.selected');
-                    if (!selectedOption) {
-                        alert('Escolha uma forma de pagamento para continuar.');
-                        return;
-                    }
-                    
-                    const method = selectedOption.dataset.method;
-                    console.log('Kiosk mode: Payment method:', method);
-                    console.log('Kiosk mode: window.order exists?', typeof window.order !== 'undefined');
-                    
-                    if (typeof window.order !== 'undefined') {
-                        console.log('Kiosk mode: window.order:', window.order);
-                        window.order.payment = window.order.payment || {};
-                        window.order.payment.method = method;
-                        
-                        if (method === 'dinheiro') {
-                            const trocoInput = document.getElementById('troco-para');
-                            const valorPago = parseFloat(trocoInput.value);
-                            if (isNaN(valorPago) || valorPago < window.order.total) {
-                                alert(`Por favor, informe um valor igual ou maior que R$ ${window.order.total.toFixed(2).replace('.', ',')}`);
-                                return;
-                            }
-                            window.order.payment.valorPago = valorPago;
-                        } else {
-                            window.order.payment.valorPago = null;
-                        }
-                        
-                        console.log('Kiosk mode: Calling sendOrderToAPI');
-                        console.log('Kiosk mode: sendOrderToAPI exists?', typeof sendOrderToAPI);
-                        // Send order to API instead of WhatsApp
-                        await sendOrderToAPI();
-                    } else {
-                        console.error('Kiosk mode: window.order is not defined!');
-                    }
-                });
+        // Inject a callback for script.js to call when payment is confirmed
+        window.kioskSendOrder = async function() {
+            console.log('Kiosk mode: kioskSendOrder called');
+            
+            if (typeof window.order === 'undefined') {
+                console.error('Kiosk mode: window.order is not defined!');
+                alert('Erro: pedido não encontrado. Tente novamente.');
+                return;
             }
-        });
-        
-        observer.observe(document.body, { childList: true, subtree: true });
+            
+            console.log('Kiosk mode: window.order:', window.order);
+            
+            // Show loading state
+            const confirmPaymentBtn = document.getElementById('confirm-payment');
+            if (confirmPaymentBtn) {
+                confirmPaymentBtn.disabled = true;
+                confirmPaymentBtn.textContent = 'Enviando pedido...';
+            }
+            
+            try {
+                // Prepare order data
+                const orderData = {
+                    customerName: KIOSK_CONFIG.customerName || 'Cliente Kiosk',
+                    customerPhone: null,
+                    items: [{
+                        product: `Açaí ${window.order.size.name}`,
+                        quantity: 1,
+                        size: window.order.size.name,
+                        addons: [
+                            ...window.order.frutas,
+                            ...window.order.sorvetes,
+                            ...window.order.toppings
+                        ],
+                        notes: window.order.notes,
+                        unitPrice: window.order.size.price
+                    }],
+                    total: window.order.total,
+                    paymentMethod: window.order.payment.method,
+                    paymentDetails: window.order.payment.method === 'dinheiro' ? {
+                        valorPago: window.order.payment.valorPago
+                    } : null,
+                    origin: 'kiosk',
+                    notes: window.order.notes
+                };
+
+                console.log('Kiosk mode: Sending order data:', orderData);
+
+                // Send to API
+                const response = await fetch('/.netlify/functions/create-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                const result = await response.json();
+                console.log('Kiosk mode: API response:', result);
+
+                if (!response.ok || !result.success) {
+                    throw new Error(result.error || 'Erro ao enviar pedido');
+                }
+
+                // Show success message
+                showOrderConfirmation(result.order.orderNumber);
+
+            } catch (error) {
+                console.error('Kiosk mode: Erro ao enviar pedido:', error);
+                alert('Não foi possível registrar seu pedido. Verifique sua conexão e tente novamente.');
+                
+                // Re-enable button
+                if (confirmPaymentBtn) {
+                    confirmPaymentBtn.disabled = false;
+                    confirmPaymentBtn.textContent = 'Confirmar';
+                }
+            }
+        };
     }
     
     // Handle order completion
