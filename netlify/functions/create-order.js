@@ -11,7 +11,13 @@ if (!supabaseUrl || !supabaseKey) {
   console.error('SUPABASE_SERVICE_ROLE_KEY:', supabaseKey ? 'Configurada' : 'Não configurada');
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Remove /rest/v1/ se estiver presente na URL
+const cleanSupabaseUrl = supabaseUrl.replace(/\/rest\/v1\/?$/, '');
+
+console.log('Supabase URL original:', supabaseUrl);
+console.log('Supabase URL limpa:', cleanSupabaseUrl);
+
+const supabase = createClient(cleanSupabaseUrl, supabaseKey);
 
 exports.handler = async (event) => {
   // Apenas permite POST
