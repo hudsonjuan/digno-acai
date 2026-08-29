@@ -58,16 +58,8 @@ exports.handler = async (event) => {
       // Usa o valor calculado no backend
     }
 
-    // Gera próximo número de pedido
-    const { data: sequenceData, error: sequenceError } = await supabase
-      .rpc('get_next_order_number');
-
-    if (sequenceError) {
-      console.error('Erro ao gerar número do pedido:', sequenceError);
-      throw new Error('Erro ao gerar número do pedido');
-    }
-
-    const orderNumber = sequenceData;
+    // Gera próximo número de pedido (simplificado - usa timestamp)
+    const orderNumber = Math.floor(Date.now() / 1000) % 10000;
 
     // Insere o pedido no banco
     const { data: order, error: insertError } = await supabase
