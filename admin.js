@@ -89,13 +89,17 @@ async function handleLogin(e) {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     
+    console.log('Login attempt:', email);
+    
     try {
         // Simple authentication (in production, use Supabase Auth)
         if (email === 'admin@dignoacai.com' && password === 'admin123') {
+            console.log('Login successful');
             currentUser = { email, name: 'Administrador' };
             localStorage.setItem('adminToken', JSON.stringify(currentUser));
             showDashboard();
         } else {
+            console.log('Invalid credentials');
             showError('Email ou senha inválidos');
         }
     } catch (error) {

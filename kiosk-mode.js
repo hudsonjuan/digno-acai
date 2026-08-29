@@ -309,41 +309,57 @@ function setupKioskEventListeners() {
     
     // Override the payment confirmation in kiosk mode to send to API
     if (KIOSK_CONFIG.isKioskMode) {
-        const confirmPaymentBtn = document.getElementById('confirm-payment');
-        if (confirmPaymentBtn) {
-            // Remove existing listeners by cloning
-            const newBtn = confirmPaymentBtn.cloneNode(true);
-            confirmPaymentBtn.parentNode.replaceChild(newBtn, confirmPaymentBtn);
-            
-            newBtn.addEventListener('click', async function() {
-                const selectedOption = document.querySelector('.payment-option.selected');
-                if (!selectedOption) {
-                    alert('Escolha uma forma de pagamento para continuar.');
-                    return;
-                }
+        console.log('Kiosk mode: Setting up API integration');
+        
+        // Wait for the payment modal to be created
+        const observer = new MutationObserver((mutations) => {
+            const confirmPaymentBtn = document.getElementById('confirm-payment');
+            if (confirmPaymentBtn && !confirmPaymentBtn.dataset.kioskSetup) {
+                console.log('Kiosk mode: Found confirm button, setting up API integration');
+                confirmPaymentBtn.dataset.kioskSetup = 'true';
                 
-                const method = selectedOption.dataset.method;
-                if (typeof window.order !== 'undefined') {
-                    window.order.payment = window.order.payment || {};
-                    window.order.payment.method = method;
+                // Remove existing listeners by cloning
+                const newBtn = confirmPaymentBtn.cloneNode(true);
+                confirmPaymentBtn.parentNode.replaceChild(newBtn, confirmPaymentBtn);
+                
+                newBtn.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    console.log('Kiosk mode: Confirm button clicked');
                     
-                    if (method === 'dinheiro') {
-                        const trocoInput = document.getElementById('troco-para');
-                        const valorPago = parseFloat(trocoInput.value);
-                        if (isNaN(valorPago) || valorPago < window.order.total) {
-                            alert(`Por favor, informe um valor igual ou maior que R$ ${window.order.total.toFixed(2).replace('.', ',')}`);
-                            return;
-                        }
-                        window.order.payment.valorPago = valorPago;
-                    } else {
-                        window.order.payment.valorPago = null;
+                    const selectedOption = document.querySelector('.payment-option.selected');
+                    if (!selectedOption) {
+                        alert('Escolha uma forma de pagamento para continuar.');
+                        return;
                     }
                     
-                    // Send order to API instead of WhatsApp
-                    await sendOrderToAPI();
-                }
-            });
-        }
+                    const method = selectedOption.dataset.method;
+                    console.log('Kiosk mode: Payment method:', method);
+                    
+                    if (typeof window.order !== 'undefined') {
+                        window.order.payment = window.order.payment || {};
+                        window.order.payment.method = method;
+                        
+                        if (method === 'dinheiro') {
+                            const trocoInput = document.getElementById('troco-para');
+                            const valorPago = parseFloat(trocoInput.value);
+                            if (isNaN(valorPago) || valorPago < window.order.total) {
+                                alert(`Por favor, informe um valor igual ou maior que R$ ${window.order.total.toFixed(2).replace('.', ',')}`);
+                                return;
+                            }
+                            window.order.payment.valorPago = valorPago;
+                        } else {
+                            window.order.payment.valorPago = null;
+                        }
+                        
+                        console.log('Kiosk mode: Sending order to API');
+                        // Send order to API instead of WhatsApp
+                        await sendOrderToAPI();
+                    }
+                });
+            }
+        });
+        
+        observer.observe(document.body, { childList: true, subtree: true });
     }
     
     // Handle order completion
