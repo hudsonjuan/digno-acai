@@ -307,27 +307,43 @@ function setupKioskEventListeners() {
         };
     }
     
-    // Override the WhatsApp redirection to force page reload after sending
-    if (typeof window.open === 'function' && KIOSK_CONFIG.isKioskMode) {
-        const originalOpen = window.open;
-        window.open = function(url, target, features) {
-            if (url && url.includes('wa.me')) {
-                // Save the URL to open
-                const whatsappUrl = url;
+    // Override the payment confirmation in kiosk mode to send to API
+    if (KIOSK_CONFIG.isKioskMode) {
+        const confirmPaymentBtn = document.getElementById('confirm-payment');
+        if (confirmPaymentBtn) {
+            // Remove existing listeners by cloning
+            const newBtn = confirmPaymentBtn.cloneNode(true);
+            confirmPaymentBtn.parentNode.replaceChild(newBtn, confirmPaymentBtn);
+            
+            newBtn.addEventListener('click', async function() {
+                const selectedOption = document.querySelector('.payment-option.selected');
+                if (!selectedOption) {
+                    alert('Escolha uma forma de pagamento para continuar.');
+                    return;
+                }
                 
-                // Clear all kiosk-related data
-                sessionStorage.removeItem('customerName');
-                
-                // Open WhatsApp in a new tab
-                const newWindow = originalOpen.call(window, whatsappUrl, '_blank');
-                
-                // Force page reload to reset all states
-                window.location.href = window.location.pathname + '?kiosk=1';
-                
-                return newWindow;
-            }
-            return originalOpen.apply(window, arguments);
-        };
+                const method = selectedOption.dataset.method;
+                if (typeof window.order !== 'undefined') {
+                    window.order.payment = window.order.payment || {};
+                    window.order.payment.method = method;
+                    
+                    if (method === 'dinheiro') {
+                        const trocoInput = document.getElementById('troco-para');
+                        const valorPago = parseFloat(trocoInput.value);
+                        if (isNaN(valorPago) || valorPago < window.order.total) {
+                            alert(`Por favor, informe um valor igual ou maior que R$ ${window.order.total.toFixed(2).replace('.', ',')}`);
+                            return;
+                        }
+                        window.order.payment.valorPago = valorPago;
+                    } else {
+                        window.order.payment.valorPago = null;
+                    }
+                    
+                    // Send order to API instead of WhatsApp
+                    await sendOrderToAPI();
+                }
+            });
+        }
     }
     
     // Handle order completion
@@ -452,3 +468,122 @@ notificationStyle.textContent = `
     }
 `;
 document.head.appendChild(notificationStyle);
+
+/**
+ * Send order to API in kiosk mode
+ */
+async function sendOrderToAPI() {
+    if (!window.order) {
+        alert('Erro: pedido não encontrado');
+        return;
+    }
+
+    // Show loading state
+    const confirmPaymentBtn = document.getElementById('confirm-payment');
+    if (confirmPaymentBtn) {
+        confirmPaymentBtn.disabled = true;
+        confirmPaymentBtn.textContent = 'Enviando pedido...';
+    }
+
+    try {
+        // Prepare order data
+        const orderData = {
+            customerName: KIOSK_CONFIG.customerName || 'Cliente Kiosk',
+            customerPhone: null,
+            items: [{
+                product: `Açaí ${window.order.size.name}`,
+                quantity: 1,
+                size: window.order.size.name,
+                addons: [
+                    ...window.order.frutas,
+                    ...window.order.sorvetes,
+                    ...window.order.toppings
+                ],
+                notes: window.order.notes,
+                unitPrice: window.order.size.price
+            }],
+            total: window.order.total,
+            paymentMethod: window.order.payment.method,
+            paymentDetails: window.order.payment.method === 'dinheiro' ? {
+                valorPago: window.order.payment.valorPago
+            } : null,
+            origin: 'kiosk',
+            notes: window.order.notes
+        };
+
+        // Send to API
+        const response = await fetch('/.netlify/functions/create-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderData)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Erro ao enviar pedido');
+        }
+
+        // Show success message
+        showOrderConfirmation(result.order.orderNumber);
+
+    } catch (error) {
+        console.error('Erro ao enviar pedido:', error);
+        alert('Não foi possível registrar seu pedido. Verifique sua conexão e tente novamente.');
+        
+        // Re-enable button
+        if (confirmPaymentBtn) {
+            confirmPaymentBtn.disabled = false;
+            confirmPaymentBtn.textContent = 'Confirmar';
+        }
+    }
+}
+
+/**
+ * Show order confirmation modal
+ */
+function showOrderConfirmation(orderNumber) {
+    // Close payment modal
+    const paymentModal = document.getElementById('payment-method-modal');
+    if (paymentModal) {
+        paymentModal.classList.remove('show');
+    }
+
+    // Create confirmation modal
+    const confirmationModal = document.createElement('div');
+    confirmationModal.className = 'modal show';
+    confirmationModal.id = 'order-confirmation-modal';
+    confirmationModal.innerHTML = `
+        <div class="modal-content" style="text-align: center; padding: 40px;">
+            <div style="font-size: 64px; margin-bottom: 20px;">✅</div>
+            <h2 style="color: #27ae60; margin-bottom: 10px;">PEDIDO REALIZADO!</h2>
+            <p style="font-size: 1.5rem; font-weight: bold; margin-bottom: 10px;">Seu pedido é: <span style="color: #8e44ad;">#${orderNumber}</span></p>
+            <p style="color: #666; margin-bottom: 30px;">Aguarde seu pedido ficar pronto.</p>
+            <button id="new-order-btn" class="primary-btn" style="font-size: 1.2rem; padding: 18px 30px;">
+                FAZER NOVO PEDIDO
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(confirmationModal);
+
+    // Add event listener to new order button
+    document.getElementById('new-order-btn').addEventListener('click', function() {
+        // Remove confirmation modal
+        confirmationModal.remove();
+        
+        // Reset order completely
+        if (typeof window.resetOrder === 'function') {
+            window.resetOrder();
+        }
+        
+        // Clear kiosk data
+        sessionStorage.removeItem('customerName');
+        KIOSK_CONFIG.customerName = null;
+        
+        // Reload page to start fresh
+        window.location.href = window.location.pathname + '?kiosk=1';
+    });
+}

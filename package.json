@@ -1,0 +1,23 @@
+{
+  "name": "digno-acai",
+  "version": "1.0.0",
+  "description": "Sistema de pedidos para Digno Açaí",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "netlify build"
+  },
+  "keywords": [
+    "acai",
+    "pedidos",
+    "kiosk"
+  ],
+  "author": "Hudson Juan",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}

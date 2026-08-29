@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Digno Açaí</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-container">
+            <div class="login-logo">
+                <h1>🍧 Digno Açaí</h1>
+                <p>Painel Administrativo</p>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="admin@dignoacai.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="primary-btn">Entrar</button>
+                <p id="login-error" class="error-message"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="admin-dashboard" style="display: none;">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-content">
+                <h1>🍧 Digno Açaí</h1>
+                <p>Painel de Pedidos</p>
+            </div>
+            <div class="header-actions">
+                <button id="sound-toggle" class="icon-btn" title="Ativar/Desativar som">
+                    🔔
+                </button>
+                <button id="logout-btn" class="secondary-btn">Sair</button>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-container">
+            <div class="stat-card new">
+                <div class="stat-icon">🔔</div>
+                <div class="stat-content">
+                    <span class="stat-number" id="stat-new">0</span>
+                    <span class="stat-label">Novos</span>
+                </div>
+            </div>
+            <div class="stat-card preparing">
+                <div class="stat-icon">👨‍🍳</div>
+                <div class="stat-content">
+                    <span class="stat-number" id="stat-preparing">0</span>
+                    <span class="stat-label">Em Preparo</span>
+                </div>
+            </div>
+            <div class="stat-card ready">
+                <div class="stat-icon">✅</div>
+                <div class="stat-content">
+                    <span class="stat-number" id="stat-ready">0</span>
+                    <span class="stat-label">Prontos</span>
+                </div>
+            </div>
+            <div class="stat-card completed">
+                <div class="stat-icon">✓</div>
+                <div class="stat-content">
+                    <span class="stat-number" id="stat-completed">0</span>
+                    <span class="stat-label">Finalizados</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="filter-group">
+                <input type="text" id="search-input" placeholder="Buscar por número ou nome...">
+                <select id="status-filter">
+                    <option value="">Todos os status</option>
+                    <option value="new">Novos</option>
+                    <option value="preparing">Em Preparo</option>
+                    <option value="ready">Prontos</option>
+                    <option value="completed">Finalizados</option>
+                    <option value="cancelled">Cancelados</option>
+                </select>
+                <select id="origin-filter">
+                    <option value="">Todas as origens</option>
+                    <option value="kiosk">Kiosk</option>
+                    <option value="online">Online</option>
+                </select>
+            </div>
+            <button id="refresh-btn" class="icon-btn" title="Atualizar">
+                🔄
+            </button>
+        </div>
+
+        <!-- Kanban Board -->
+        <div class="kanban-board">
+            <!-- New Orders -->
+            <div class="kanban-column" id="column-new">
+                <div class="column-header">
+                    <h2>🔔 Novos</h2>
+                    <span class="column-count" id="count-new">0</span>
+                </div>
+                <div class="column-content" id="orders-new">
+                    <!-- Orders will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Preparing -->
+            <div class="kanban-column" id="column-preparing">
+                <div class="column-header">
+                    <h2>👨‍🍳 Em Preparo</h2>
+                    <span class="column-count" id="count-preparing">0</span>
+                </div>
+                <div class="column-content" id="orders-preparing">
+                    <!-- Orders will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Ready -->
+            <div class="kanban-column" id="column-ready">
+                <div class="column-header">
+                    <h2>✅ Prontos</h2>
+                    <span class="column-count" id="count-ready">0</span>
+                </div>
+                <div class="column-content" id="orders-ready">
+                    <!-- Orders will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Completed -->
+            <div class="kanban-column" id="column-completed">
+                <div class="column-header">
+                    <h2>✓ Finalizados</h2>
+                    <span class="column-count" id="count-completed">0</span>
+                </div>
+                <div class="column-content" id="orders-completed">
+                    <!-- Orders will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="history-section">
+            <div class="history-header">
+                <h2>Histórico de Pedidos</h2>
+                <button id="show-history-btn" class="secondary-btn">Ver Histórico</button>
+            </div>
+            <div id="history-content" class="history-content" style="display: none;">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Cliente</th>
+                            <th>Valor</th>
+                            <th>Horário</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body">
+                        <!-- History will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div id="order-modal" class="modal">
+        <div class="modal-content order-modal-content">
+            <div class="modal-header">
+                <h2 id="modal-order-number">Pedido #000</h2>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-order-details">
+                <!-- Order details will be loaded here -->
+            </div>
+            <div class="modal-footer" id="modal-actions">
+                <!-- Action buttons will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
