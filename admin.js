@@ -170,15 +170,15 @@ function playNotificationSound() {
 
         // Chime sound: C5 -> E5 -> G5
         oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
-        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
-        oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.3); // E5
+        oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.6); // G5
         oscillator.type = 'sine';
 
         gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.5);
 
         oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.4);
+        oscillator.stop(audioContext.currentTime + 1.5);
     } catch (error) {
         console.error('Error playing sound:', error);
     }
