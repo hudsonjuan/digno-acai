@@ -55,6 +55,8 @@ function init() {
 
 // Configura os event listeners
 function setupEventListeners() {
+    console.log('DEBUG setupEventListeners - configurando event listeners');
+
     // Seleção de tamanho
     sizeButtons.forEach(button => {
         button.addEventListener('click', (e) => {
@@ -62,32 +64,40 @@ function setupEventListeners() {
             selectSize(button);
         });
     });
-    
+
     // Botão de finalizar pedido
     checkoutButton.addEventListener('click', (e) => {
         e.preventDefault();
-        
+
         // Mostra o modal de pagamento primeiro
         showPaymentMethodModal();
     });
 
     // Seleção de frutas
-    document.querySelectorAll('input[name="fruta"]').forEach(checkbox => {
+    const frutasInputs = document.querySelectorAll('input[name="fruta"]');
+    console.log('DEBUG setupEventListeners - frutasInputs:', frutasInputs.length);
+    frutasInputs.forEach(checkbox => {
         checkbox.addEventListener('change', updateFrutas);
     });
 
     // Seleção de sorvetes
-    document.querySelectorAll('input[name="sorvete"]').forEach(checkbox => {
+    const sorvetesInputs = document.querySelectorAll('input[name="sorvete"]');
+    console.log('DEBUG setupEventListeners - sorvetesInputs:', sorvetesInputs.length);
+    sorvetesInputs.forEach(checkbox => {
         checkbox.addEventListener('change', updateSorvetes);
     });
 
     // Seleção de caldas com limite de 2
-    document.querySelectorAll('input[name="calda"]').forEach(checkbox => {
+    const caldasInputs = document.querySelectorAll('input[name="calda"]');
+    console.log('DEBUG setupEventListeners - caldasInputs:', caldasInputs.length);
+    caldasInputs.forEach(checkbox => {
         checkbox.addEventListener('change', updateCaldas);
     });
 
     // Seleção de toppings (acompanhamentos) com limite de 3
-    document.querySelectorAll('input[name="topping"]').forEach(checkbox => {
+    const toppingsInputs = document.querySelectorAll('input[name="topping"]');
+    console.log('DEBUG setupEventListeners - toppingsInputs:', toppingsInputs.length);
+    toppingsInputs.forEach(checkbox => {
         checkbox.addEventListener('change', updateToppings);
     });
 
