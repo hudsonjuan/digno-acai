@@ -4,7 +4,8 @@ const ADMIN_CONFIG = {
     supabaseAnonKey: null,
     soundEnabled: true,
     refreshInterval: 5000, // 5 seconds for polling
-    lastOrderCount: 0
+    lastOrderCount: 0,
+    lastOrderIds: new Set()
 };
 
 // Initialize Supabase client (will be set in initializeSupabase)
@@ -144,6 +145,27 @@ function toggleSound() {
     btn.classList.toggle('active', ADMIN_CONFIG.soundEnabled);
 }
 
+function playNotificationSound() {
+    if (!ADMIN_CONFIG.soundEnabled) return;
+
+    // Use Web Audio API to play a notification sound
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = 800; // Frequency in Hz
+    oscillator.type = 'sine';
+
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.5);
+}
+
 function startAutoRefresh() {
     if (refreshTimer) clearInterval(refreshTimer);
     refreshTimer = setInterval(loadOrders, ADMIN_CONFIG.refreshInterval);
@@ -181,18 +203,22 @@ async function loadOrders() {
         console.log('Admin: Orders received:', data);
         orders = data || [];
         console.log('Admin: Orders array length:', orders.length);
-        
-        // Check for new orders
-        const currentCount = orders.filter(o => o.status === 'new').length;
-        if (currentCount > ADMIN_CONFIG.lastOrderCount && ADMIN_CONFIG.soundEnabled) {
+
+        // Check for new orders by comparing IDs
+        const currentOrderIds = new Set(orders.map(o => o.id));
+        const newOrderIds = [...currentOrderIds].filter(id => !ADMIN_CONFIG.lastOrderIds.has(id));
+
+        if (newOrderIds.length > 0) {
+            console.log('Admin: New orders detected:', newOrderIds);
             playNotificationSound();
         }
-        ADMIN_CONFIG.lastOrderCount = currentCount;
-        
+
+        ADMIN_CONFIG.lastOrderIds = currentOrderIds;
+
         console.log('Admin: Calling renderOrders');
         renderOrders();
         updateStats();
-        
+
     } catch (error) {
         console.error('Error loading orders:', error);
     }
