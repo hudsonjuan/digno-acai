@@ -21,16 +21,13 @@ const cancelButton = document.getElementById('cancel-btn');
 
 // Estado do pedido
 let order = {
-    size: {
-        name: '300 ml',
-        price: 14.00
-    },
+    size: null,
     frutas: [],
     sorvetes: [],
     caldas: [],
     toppings: [],
     notes: '',
-    total: 14.00,
+    total: 0,
     formaPagamento: null,
     trocoPara: null,
     extras: {
@@ -68,6 +65,12 @@ function setupEventListeners() {
     // Botão de finalizar pedido
     checkoutButton.addEventListener('click', (e) => {
         e.preventDefault();
+
+        // Exige que um tamanho seja selecionado antes de continuar
+        if (!order.size) {
+            alert('Por favor, selecione o tamanho do seu açaí antes de finalizar o pedido.');
+            return;
+        }
 
         // Mostra o modal de pagamento primeiro
         showPaymentMethodModal();
@@ -124,7 +127,7 @@ function selectSize(selectedButton) {
     
     // Atualiza o tamanho e preço do pedido
     order.size = {
-        name: selectedButton.dataset.size === 'barca' ? 'Barca de Açaí' : `${selectedButton.dataset.size}ml`,
+        name: selectedButton.dataset.size === 'barca' ? 'Barca de Açaí' : `${selectedButton.dataset.size} ml`,
         price: parseFloat(selectedButton.dataset.price)
     };
     
@@ -259,7 +262,8 @@ function updateVisualHints() {
 function updateUI() {
     // Atualiza o tamanho selecionado
     document.querySelectorAll('.option-btn').forEach(button => {
-        if (button.dataset.size === order.size.name.replace('ml', '')) {
+        const selectedSize = order.size ? order.size.name.split(' ')[0] : null;
+        if (selectedSize && button.dataset.size === selectedSize) {
             button.classList.add('active');
         } else {
             button.classList.remove('active');
@@ -534,15 +538,17 @@ return message;
 // Reseta o pedido
 function resetOrder() {
     order = {
-        size: {
-            name: '300ml',
-            price: 14.00
-        },
+        size: null,
         frutas: [],
         sorvetes: [],
+        caldas: [],
         toppings: [],
         notes: '',
-        total: 14.00
+        total: 0,
+        extras: {
+            frutasAdicionais: 0,
+            sorvetesAdicionais: 0
+        }
     };
     
     localStorage.removeItem('acaiOrder');
@@ -563,13 +569,13 @@ function loadFromLocalStorage() {
             
             // Carrega os dados básicos
             order = {
-                size: parsedOrder.size || { name: '300ml', price: 14.00 },
+                size: parsedOrder.size || null,
                 frutas: Array.isArray(parsedOrder.frutas) ? parsedOrder.frutas : [],
                 sorvetes: Array.isArray(parsedOrder.sorvetes) ? parsedOrder.sorvetes : [],
                 caldas: Array.isArray(parsedOrder.caldas) ? parsedOrder.caldas : [],
                 toppings: Array.isArray(parsedOrder.toppings) ? parsedOrder.toppings : [],
                 notes: parsedOrder.notes || '',
-                total: parsedOrder.total || 14.00,
+                total: parsedOrder.total || 0,
                 extras: {
                     frutasAdicionais: 0,
                     sorvetesAdicionais: 0
