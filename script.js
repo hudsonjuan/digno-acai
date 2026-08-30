@@ -248,17 +248,7 @@ function updateVisualHints() {
         }
     }
     
-    // Atualiza dicas visuais para sorvetes
-    const sorvetesSelecionados = order.sorvetes.length;
-    const sorvetesInfo = Array.from(document.querySelectorAll('h3')).find(h => h.textContent.includes('Sorvetes'))?.nextElementSibling;
-    
-    if (sorvetesSelecionados > 1) {
-        sorvetesInfo.textContent = `1 incluso. +R$ ${(sorvetesSelecionados - 1) * CONFIG.prices.sorveteAdicional} em sorvetes adicionais.`;
-        sorvetesInfo.style.color = '#e74c3c';
-    } else {
-        sorvetesInfo.textContent = '1 incluso. R$ 2,00 por adicional.';
-        sorvetesInfo.style.color = '';
-    }
+    // Sorvetes não têm mais dicas visuais
 }
 
 // Atualiza a interface do usuário
