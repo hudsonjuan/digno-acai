@@ -233,13 +233,43 @@ function createOrderCard(order) {
     const items = formatItems(order.items);
     const total = formatCurrency(order.total_cents);
     
+    // Extrair detalhes do pedido
+    let size = '-';
+    let toppings = [];
+    let sorvetes = [];
+    let caldas = [];
+    let notes = '';
+    
+    if (order.items && order.items.length > 0) {
+        const item = order.items[0];
+        size = item.size || '-';
+        if (item.addons) {
+            toppings = item.addons.filter(a => 
+                !['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(a)
+            );
+            caldas = item.addons.filter(a => 
+                ['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(a)
+            );
+        }
+        if (item.sorvetes) {
+            sorvetes = item.sorvetes;
+        }
+        notes = item.notes || '';
+    }
+    
     card.innerHTML = `
         <div class="order-card-header">
             <span class="order-number">#${order.order_number}</span>
             <span class="order-time">${time}</span>
         </div>
         <div class="order-customer">${order.customer_name}</div>
-        <div class="order-items">${items}</div>
+        <div class="order-details">
+            <div class="order-detail-line"><strong>Tamanho:</strong> ${size}</div>
+            ${toppings.length > 0 ? `<div class="order-detail-line"><strong>Acomp:</strong> ${toppings.join(', ')}</div>` : ''}
+            ${sorvetes.length > 0 ? `<div class="order-detail-line"><strong>Sorvetes:</strong> ${sorvetes.join(', ')}</div>` : ''}
+            ${caldas.length > 0 ? `<div class="order-detail-line"><strong>Caldas:</strong> ${caldas.join(', ')}</div>` : ''}
+            ${notes ? `<div class="order-detail-line"><strong>Obs:</strong> ${notes}</div>` : ''}
+        </div>
         <div class="order-meta">
             <span class="order-origin ${order.origin}">${order.origin === 'kiosk' ? '📱 Kiosk' : '🌐 Online'}</span>
         </div>
