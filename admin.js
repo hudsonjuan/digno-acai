@@ -235,33 +235,20 @@ function createOrderCard(order) {
     
     // Extrair detalhes do pedido
     let size = '-';
-    let frutas = [];
-    let sorvetes = [];
-    let caldas = [];
-    let acompanhamentos = [];
+    let allAddons = [];
     let notes = '';
     
     if (order.items && order.items.length > 0) {
         const item = order.items[0];
         size = item.size || '-';
         
-        // Lidar com ambos os formatos: antigo (array de strings) e novo (array de objetos)
+        // Extrair todos os addons como strings simples
         if (item.addons) {
             item.addons.forEach(addon => {
                 if (typeof addon === 'string') {
-                    // Formato antigo: string simples
-                    acompanhamentos.push(addon);
+                    allAddons.push(addon);
                 } else if (typeof addon === 'object' && addon.name) {
-                    // Formato novo: objeto com name e type
-                    if (addon.type === 'fruta') {
-                        frutas.push(addon.name);
-                    } else if (addon.type === 'sorvete') {
-                        sorvetes.push(addon.name);
-                    } else if (addon.type === 'calda') {
-                        caldas.push(addon.name);
-                    } else {
-                        acompanhamentos.push(addon.name);
-                    }
+                    allAddons.push(addon.name);
                 }
             });
         }
@@ -277,10 +264,7 @@ function createOrderCard(order) {
         <div class="order-customer">${order.customer_name}</div>
         <div class="order-details">
             <div class="order-detail-line"><strong>Tamanho:</strong> ${size}</div>
-            ${frutas.length > 0 ? `<div class="order-detail-line"><strong>Frutas:</strong> ${frutas.join(', ')}</div>` : ''}
-            ${sorvetes.length > 0 ? `<div class="order-detail-line"><strong>Sorvetes:</strong> ${sorvetes.join(', ')}</div>` : ''}
-            ${caldas.length > 0 ? `<div class="order-detail-line"><strong>Caldas:</strong> ${caldas.join(', ')}</div>` : ''}
-            ${acompanhamentos.length > 0 ? `<div class="order-detail-line"><strong>Acomp:</strong> ${acompanhamentos.join(', ')}</div>` : ''}
+            ${allAddons.length > 0 ? `<div class="order-detail-line"><strong>Adicionais:</strong> ${allAddons.join(', ')}</div>` : ''}
             ${notes ? `<div class="order-detail-line"><strong>Obs:</strong> ${notes}</div>` : ''}
         </div>
         <div class="order-meta">

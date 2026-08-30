@@ -340,10 +340,10 @@ function setupKioskEventListeners() {
                         quantity: 1,
                         size: window.order.size.name,
                         addons: [
-                            ...window.order.frutas.map(f => ({ name: f, type: 'fruta' })),
-                            ...window.order.sorvetes.map(s => ({ name: s, type: 'sorvete' })),
-                            ...window.order.caldas.map(c => ({ name: c, type: 'calda' })),
-                            ...window.order.toppings.map(t => ({ name: t, type: 'acompanhamento' }))
+                            ...window.order.frutas,
+                            ...window.order.sorvetes,
+                            ...window.order.caldas,
+                            ...window.order.toppings
                         ],
                         notes: window.order.notes,
                         unitPrice: window.order.size.price
