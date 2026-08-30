@@ -1,7 +1,8 @@
 // Configurações
 const CONFIG = {
     whatsappNumber: '5598985780249',
-    maxToppings: Infinity,
+    maxToppings: 3,
+    maxCaldas: 2,
     prices: {
         frutaAdicional: 1.00,    // R$ 1,00 por fruta adicional (acima de 2)
         sorveteAdicional: 2.00   // R$ 2,00 por sorvete adicional (acima de 1)
@@ -191,9 +192,18 @@ function updateToppings(event) {
             !['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(t)
         );
         
-        if (event.target.checked && acompanhamentosAtuais.length >= CONFIG.limits.maxToppings) {
+        if (event.target.checked && acompanhamentosAtuais.length >= CONFIG.maxToppings) {
             event.target.checked = false;
-            alert(`Você pode escolher até ${CONFIG.limits.maxToppings} acompanhamentos.`);
+            return;
+        }
+    } else {
+        // Limita caldas a 2
+        const caldasAtuais = order.toppings.filter(t => 
+            ['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(t)
+        );
+        
+        if (event.target.checked && caldasAtuais.length >= CONFIG.maxCaldas) {
+            event.target.checked = false;
             return;
         }
     }
