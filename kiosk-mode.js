@@ -331,7 +331,14 @@ function setupKioskEventListeners() {
             }
             
             try {
-                // Prepare order data
+                // Coleta dados diretamente do DOM para garantir que funcionam
+                const frutas = Array.from(document.querySelectorAll('input[name="fruta"]:checked')).map(cb => cb.value);
+                const sorvetes = Array.from(document.querySelectorAll('input[name="sorvete"]:checked')).map(cb => cb.value);
+                const caldas = Array.from(document.querySelectorAll('input[name="calda"]:checked')).map(cb => cb.value);
+                const toppings = Array.from(document.querySelectorAll('input[name="topping"]:checked')).map(cb => cb.value);
+
+                const addonsList = [...frutas, ...sorvetes, ...caldas, ...toppings];
+
                 const orderData = {
                     customerName: KIOSK_CONFIG.customerName || 'Cliente Kiosk',
                     customerPhone: null,
@@ -339,29 +346,18 @@ function setupKioskEventListeners() {
                         product: `Açaí ${window.order.size.name}`,
                         quantity: 1,
                         size: window.order.size.name,
-                        addons: [
-                            ...window.order.frutas,
-                            ...window.order.sorvetes,
-                            ...window.order.caldas,
-                            ...window.order.toppings
-                        ],
+                        addons: addonsList,
                         notes: window.order.notes,
                         unitPrice: window.order.size.price
                     }],
                     total: window.order.total,
-                    paymentMethod: window.order.payment?.method || 'pix', // Default to pix if not set
+                    paymentMethod: window.order.payment?.method || 'pix',
                     paymentDetails: window.order.payment?.method === 'dinheiro' ? {
                         valorPago: window.order.payment.valorPago
                     } : null,
                     origin: 'kiosk',
                     notes: window.order.notes
                 };
-
-                console.log('DEBUG - window.order.frutas:', window.order.frutas);
-                console.log('DEBUG - window.order.sorvetes:', window.order.sorvetes);
-                console.log('DEBUG - window.order.caldas:', window.order.caldas);
-                console.log('DEBUG - window.order.toppings:', window.order.toppings);
-                console.log('DEBUG - orderData:', JSON.stringify(orderData, null, 2));
 
                 // Send to API
                 const response = await fetch('/.netlify/functions/create-order', {
