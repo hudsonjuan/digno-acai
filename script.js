@@ -184,6 +184,14 @@ function updateCaldas(event) {
 function updateToppings(event) {
     const topping = event.target.value;
     
+    // Se está desmarcando, permite sempre
+    if (!event.target.checked) {
+        order.toppings = order.toppings.filter(t => t !== topping);
+        updateTotal();
+        saveToLocalStorage();
+        return;
+    }
+    
     // Filtra apenas acompanhamentos (não caldas)
     const isCalda = ['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(topping);
     
@@ -192,7 +200,7 @@ function updateToppings(event) {
             !['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(t)
         );
         
-        if (event.target.checked && acompanhamentosAtuais.length >= CONFIG.maxToppings) {
+        if (acompanhamentosAtuais.length >= CONFIG.maxToppings) {
             event.target.checked = false;
             return;
         }
@@ -202,18 +210,14 @@ function updateToppings(event) {
             ['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(t)
         );
         
-        if (event.target.checked && caldasAtuais.length >= CONFIG.maxCaldas) {
+        if (caldasAtuais.length >= CONFIG.maxCaldas) {
             event.target.checked = false;
             return;
         }
     }
     
-    if (event.target.checked) {
-        if (!order.toppings.includes(topping)) {
-            order.toppings.push(topping);
-        }
-    } else {
-        order.toppings = order.toppings.filter(t => t !== topping);
+    if (!order.toppings.includes(topping)) {
+        order.toppings.push(topping);
     }
     
     updateTotal();
