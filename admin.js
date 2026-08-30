@@ -429,18 +429,33 @@ function openOrderModal(orderId) {
         
         <div class="order-detail-section">
             <h3>Itens</h3>
-            ${order.items.map(item => `
+            ${order.items.map(item => {
+                // Formatar addons para lidar com ambos os formatos
+                let addonsText = '';
+                if (item.addons && item.addons.length > 0) {
+                    addonsText = item.addons.map(addon => {
+                        if (typeof addon === 'string') {
+                            return addon;
+                        } else if (typeof addon === 'object' && addon.name) {
+                            return addon.name;
+                        }
+                        return '';
+                    }).filter(a => a).join(', ');
+                }
+                
+                return `
                 <div class="order-item">
                     <div class="order-item-name">${item.product} (${item.size})</div>
-                    ${item.addons && item.addons.length > 0 ? `
-                    <div class="order-item-addons">+ ${item.addons.join(', ')}</div>
+                    ${addonsText ? `
+                    <div class="order-item-addons">+ ${addonsText}</div>
                     ` : ''}
                     ${item.notes ? `
                     <div class="order-item-addons">Obs: ${item.notes}</div>
                     ` : ''}
                     <div class="order-item-price">${formatCurrency(item.subtotalCents)}</div>
                 </div>
-            `).join('')}
+                `;
+            }).join('')}
         </div>
         
         ${order.notes ? `
