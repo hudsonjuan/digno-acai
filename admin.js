@@ -233,35 +233,18 @@ function createOrderCard(order) {
     const items = formatItems(order.items);
     const total = formatCurrency(order.total_cents);
     
-    // DEBUG: Log order structure
-    console.log('DEBUG - Order data:', JSON.stringify(order, null, 2));
-    console.log('DEBUG - Order items:', order.items);
-    
     // Extrair detalhes do pedido
     let size = '-';
-    let toppings = [];
-    let sorvetes = [];
-    let caldas = [];
+    let allAddons = [];
     let notes = '';
     
     if (order.items && order.items.length > 0) {
         const item = order.items[0];
-        console.log('DEBUG - First item:', JSON.stringify(item, null, 2));
         size = item.size || '-';
         
-        // Lista de sorvetes e caldas para filtragem
-        const sorvetesList = ['Creme com passas', 'Morango'];
-        const caldasList = ['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'];
-        
+        // Mostrar todos os addons sem filtrar
         if (item.addons) {
-            console.log('DEBUG - Addons:', item.addons);
-            // Extrair sorvetes, caldas e acompanhamentos do array addons
-            sorvetes = item.addons.filter(a => sorvetesList.includes(a));
-            caldas = item.addons.filter(a => caldasList.includes(a));
-            toppings = item.addons.filter(a => 
-                !sorvetesList.includes(a) && !caldasList.includes(a)
-            );
-            console.log('DEBUG - Filtered - Sorvetes:', sorvetes, 'Caldas:', caldas, 'Toppings:', toppings);
+            allAddons = item.addons;
         }
         
         notes = item.notes || '';
@@ -275,9 +258,7 @@ function createOrderCard(order) {
         <div class="order-customer">${order.customer_name}</div>
         <div class="order-details">
             <div class="order-detail-line"><strong>Tamanho:</strong> ${size}</div>
-            ${toppings.length > 0 ? `<div class="order-detail-line"><strong>Acomp:</strong> ${toppings.join(', ')}</div>` : ''}
-            ${sorvetes.length > 0 ? `<div class="order-detail-line"><strong>Sorvetes:</strong> ${sorvetes.join(', ')}</div>` : ''}
-            ${caldas.length > 0 ? `<div class="order-detail-line"><strong>Caldas:</strong> ${caldas.join(', ')}</div>` : ''}
+            ${allAddons.length > 0 ? `<div class="order-detail-line"><strong>Adicionais:</strong> ${allAddons.join(', ')}</div>` : ''}
             ${notes ? `<div class="order-detail-line"><strong>Obs:</strong> ${notes}</div>` : ''}
         </div>
         <div class="order-meta">
