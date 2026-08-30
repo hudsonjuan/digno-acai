@@ -357,8 +357,11 @@ function setupKioskEventListeners() {
                     notes: window.order.notes
                 };
 
-                console.log('DEBUG KIOSK - window.order:', window.order);
-                console.log('DEBUG KIOSK - orderData:', JSON.stringify(orderData, null, 2));
+                console.log('DEBUG - window.order.frutas:', window.order.frutas);
+                console.log('DEBUG - window.order.sorvetes:', window.order.sorvetes);
+                console.log('DEBUG - window.order.caldas:', window.order.caldas);
+                console.log('DEBUG - window.order.toppings:', window.order.toppings);
+                console.log('DEBUG - orderData:', JSON.stringify(orderData, null, 2));
 
                 // Send to API
                 const response = await fetch('/.netlify/functions/create-order', {
