@@ -569,6 +569,7 @@ function loadFromLocalStorage() {
                 size: parsedOrder.size || { name: '300ml', price: 14.00 },
                 frutas: Array.isArray(parsedOrder.frutas) ? parsedOrder.frutas : [],
                 sorvetes: Array.isArray(parsedOrder.sorvetes) ? parsedOrder.sorvetes : [],
+                caldas: Array.isArray(parsedOrder.caldas) ? parsedOrder.caldas : [],
                 toppings: Array.isArray(parsedOrder.toppings) ? parsedOrder.toppings : [],
                 notes: parsedOrder.notes || '',
                 total: parsedOrder.total || 14.00,
