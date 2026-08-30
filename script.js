@@ -27,6 +27,7 @@ let order = {
     },
     frutas: [],
     sorvetes: [],
+    caldas: [],
     toppings: [],
     notes: '',
     total: 14.00,
@@ -80,18 +81,13 @@ function setupEventListeners() {
         checkbox.addEventListener('change', updateSorvetes);
     });
 
+    // Seleção de caldas com limite de 2
+    document.querySelectorAll('input[name="calda"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateCaldas);
+    });
+
     // Seleção de toppings (acompanhamentos) com limite de 3
     document.querySelectorAll('input[name="topping"]').forEach(checkbox => {
-        checkbox.addEventListener('change', updateToppings);
-    });
-
-    // Seleção de caldas (apenas uma seleção permitida)
-    const caldas = document.querySelectorAll('input[name="topping"][value^="Calda"], input[name="topping"][value^="Leite Condensado"]');
-    caldas.forEach(calda => {
-        calda.addEventListener('change', updateCaldas);
-    });
-
-    document.querySelectorAll('input[name="topping"]:not([value^="Calda"]):not([value^="Leite Condensado"])').forEach(checkbox => {
         checkbox.addEventListener('change', updateToppings);
     });
 
@@ -154,28 +150,25 @@ function updateSorvetes(event) {
     saveToLocalStorage();
 }
 
-// Atualiza a seleção de caldas (apenas uma seleção permitida)
+// Atualiza a seleção de caldas
 function updateCaldas(event) {
-    const caldas = document.querySelectorAll('input[name="topping"][value^="Calda"], input[name="topping"][value^="Leite Condensado"]');
+    const caldasCheckboxes = Array.from(document.querySelectorAll('input[name="calda"]:checked'));
     
-    // Se estiver marcando uma nova calda
-    if (event.target.checked) {
-        // Desmarca outras caldas
-        caldas.forEach(calda => {
-            if (calda !== event.target) {
-                calda.checked = false;
-            }
-        });
-        
-        // Adiciona a calda selecionada
-        const caldaSelecionada = event.target.value;
-        order.toppings = order.toppings.filter(t => !['Leite Condensado', 'Calda de Chocolate', 'Calda de Morango'].includes(t));
-        order.toppings.push(caldaSelecionada);
-    } else {
-        // Se estiver desmarcando a calda atual
-        order.toppings = order.toppings.filter(t => t !== event.target.value);
+    // Se está desmarcando, permite sempre
+    if (event && !event.target.checked) {
+        order.caldas = caldasCheckboxes.map(checkbox => checkbox.value);
+        updateTotal();
+        saveToLocalStorage();
+        return;
     }
     
+    // Se está marcando, verifica o limite
+    if (order.caldas.length >= CONFIG.maxCaldas) {
+        event.target.checked = false;
+        return;
+    }
+    
+    order.caldas = caldasCheckboxes.map(checkbox => checkbox.value);
     updateTotal();
     saveToLocalStorage();
 }

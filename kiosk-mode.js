@@ -342,6 +342,7 @@ function setupKioskEventListeners() {
                         addons: [
                             ...window.order.frutas.map(f => ({ name: f, type: 'fruta' })),
                             ...window.order.sorvetes.map(s => ({ name: s, type: 'sorvete' })),
+                            ...window.order.caldas.map(c => ({ name: c, type: 'calda' })),
                             ...window.order.toppings.map(t => ({ name: t, type: 'acompanhamento' }))
                         ],
                         notes: window.order.notes,
