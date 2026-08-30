@@ -31,6 +31,9 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body);
 
+    // DEBUG: Log received data
+    console.log('DEBUG - Received body:', JSON.stringify(body, null, 2));
+
     // Validação básica
     if (!body.customerName || !body.items || !Array.isArray(body.items) || body.items.length === 0) {
       return {
@@ -46,6 +49,10 @@ exports.handler = async (event) => {
       if (!item.product || !item.size || item.unitPrice === undefined) {
         throw new Error('Item inválido: product, size e unitPrice são obrigatórios');
       }
+
+      // DEBUG: Log item data
+      console.log('DEBUG - Processing item:', JSON.stringify(item, null, 2));
+      console.log('DEBUG - Item addons:', item.addons);
 
       // Converte preço para centavos
       const unitPriceCents = Math.round(item.unitPrice * 100);
@@ -75,6 +82,8 @@ exports.handler = async (event) => {
     const orderNumber = Math.floor(Date.now() / 1000) % 10000;
 
     // Insere o pedido no banco
+    console.log('DEBUG - validatedItems to insert:', JSON.stringify(validatedItems, null, 2));
+    
     const { data: order, error: insertError } = await supabase
       .from('orders')
       .insert({
