@@ -243,17 +243,20 @@ function createOrderCard(order) {
     if (order.items && order.items.length > 0) {
         const item = order.items[0];
         size = item.size || '-';
+        
+        // Lista de sorvetes e caldas para filtragem
+        const sorvetesList = ['Creme com passas', 'Morango'];
+        const caldasList = ['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'];
+        
         if (item.addons) {
+            // Extrair sorvetes, caldas e acompanhamentos do array addons
+            sorvetes = item.addons.filter(a => sorvetesList.includes(a));
+            caldas = item.addons.filter(a => caldasList.includes(a));
             toppings = item.addons.filter(a => 
-                !['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(a)
-            );
-            caldas = item.addons.filter(a => 
-                ['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(a)
+                !sorvetesList.includes(a) && !caldasList.includes(a)
             );
         }
-        if (item.sorvetes) {
-            sorvetes = item.sorvetes;
-        }
+        
         notes = item.notes || '';
     }
     
