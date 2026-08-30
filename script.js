@@ -279,6 +279,11 @@ function updateUI() {
         checkbox.checked = order.sorvetes.includes(checkbox.value);
     });
     
+    // Atualiza caldas selecionadas
+    document.querySelectorAll('input[name="calda"]').forEach(checkbox => {
+        checkbox.checked = order.caldas.includes(checkbox.value);
+    });
+    
     // Atualiza os complementos selecionados
     document.querySelectorAll('input[name="topping"]').forEach(checkbox => {
         checkbox.checked = order.toppings.includes(checkbox.value);

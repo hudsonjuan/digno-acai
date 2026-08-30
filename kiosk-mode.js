@@ -357,7 +357,8 @@ function setupKioskEventListeners() {
                     notes: window.order.notes
                 };
 
-                console.log('Kiosk mode: Sending order data:', orderData);
+                console.log('DEBUG KIOSK - window.order:', window.order);
+                console.log('DEBUG KIOSK - orderData:', JSON.stringify(orderData, null, 2));
 
                 // Send to API
                 const response = await fetch('/.netlify/functions/create-order', {
