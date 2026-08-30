@@ -233,6 +233,10 @@ function createOrderCard(order) {
     const items = formatItems(order.items);
     const total = formatCurrency(order.total_cents);
     
+    // DEBUG: Log order structure
+    console.log('DEBUG - Order data:', JSON.stringify(order, null, 2));
+    console.log('DEBUG - Order items:', order.items);
+    
     // Extrair detalhes do pedido
     let size = '-';
     let toppings = [];
@@ -242,6 +246,7 @@ function createOrderCard(order) {
     
     if (order.items && order.items.length > 0) {
         const item = order.items[0];
+        console.log('DEBUG - First item:', JSON.stringify(item, null, 2));
         size = item.size || '-';
         
         // Lista de sorvetes e caldas para filtragem
@@ -249,12 +254,14 @@ function createOrderCard(order) {
         const caldasList = ['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'];
         
         if (item.addons) {
+            console.log('DEBUG - Addons:', item.addons);
             // Extrair sorvetes, caldas e acompanhamentos do array addons
             sorvetes = item.addons.filter(a => sorvetesList.includes(a));
             caldas = item.addons.filter(a => caldasList.includes(a));
             toppings = item.addons.filter(a => 
                 !sorvetesList.includes(a) && !caldasList.includes(a)
             );
+            console.log('DEBUG - Filtered - Sorvetes:', sorvetes, 'Caldas:', caldas, 'Toppings:', toppings);
         }
         
         notes = item.notes || '';
