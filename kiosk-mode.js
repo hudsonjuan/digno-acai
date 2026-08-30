@@ -337,7 +337,13 @@ function setupKioskEventListeners() {
                 const caldas = Array.from(document.querySelectorAll('input[name="calda"]:checked')).map(cb => cb.value);
                 const toppings = Array.from(document.querySelectorAll('input[name="topping"]:checked')).map(cb => cb.value);
 
-                const addonsList = [...frutas, ...sorvetes, ...caldas, ...toppings];
+                // Envia com tipo para separação no admin
+                const addonsList = [
+                    ...frutas.map(f => ({ name: f, type: 'fruta' })),
+                    ...sorvetes.map(s => ({ name: s, type: 'sorvete' })),
+                    ...caldas.map(c => ({ name: c, type: 'calda' })),
+                    ...toppings.map(t => ({ name: t, type: 'acompanhamento' }))
+                ];
 
                 const orderData = {
                     customerName: KIOSK_CONFIG.customerName || 'Cliente Kiosk',
