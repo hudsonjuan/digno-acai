@@ -5,7 +5,8 @@ const ADMIN_CONFIG = {
     soundEnabled: true,
     refreshInterval: 5000, // 5 seconds for polling
     lastOrderCount: 0,
-    lastOrderIds: new Set()
+    lastOrderIds: new Set(),
+    audioContext: null
 };
 
 // Initialize Supabase client (will be set in initializeSupabase)
@@ -123,6 +124,12 @@ function handleLogout() {
 function showDashboard() {
     loginScreen.style.display = 'none';
     adminDashboard.style.display = 'block';
+
+    // Initialize AudioContext on user interaction (login)
+    if (!ADMIN_CONFIG.audioContext) {
+        ADMIN_CONFIG.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
     loadOrders();
     startAutoRefresh();
 }
@@ -148,22 +155,30 @@ function toggleSound() {
 function playNotificationSound() {
     if (!ADMIN_CONFIG.soundEnabled) return;
 
-    // Use Web Audio API to play a notification sound
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
+    try {
+        // Initialize AudioContext if not already initialized
+        if (!ADMIN_CONFIG.audioContext) {
+            ADMIN_CONFIG.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
 
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+        const audioContext = ADMIN_CONFIG.audioContext;
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
 
-    oscillator.frequency.value = 800; // Frequency in Hz
-    oscillator.type = 'sine';
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
 
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        oscillator.frequency.value = 800; // Frequency in Hz
+        oscillator.type = 'sine';
 
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.5);
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (error) {
+        console.error('Error playing sound:', error);
+    }
 }
 
 function startAutoRefresh() {
