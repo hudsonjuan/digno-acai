@@ -128,10 +128,11 @@ function selectSize(selectedButton) {
 function updateFrutas(event) {
     const frutasCheckboxes = Array.from(document.querySelectorAll('input[name="fruta"]:checked'));
     order.frutas = frutasCheckboxes.map(checkbox => checkbox.value);
-    
+    console.log('DEBUG updateFrutas - order.frutas:', order.frutas);
+
     // Calcula frutas adicionais (acima de 2)
     order.extras.frutasAdicionais = Math.max(0, order.frutas.length - 2);
-    
+
     updateTotal();
     updateVisualHints();
     saveToLocalStorage();
@@ -141,10 +142,11 @@ function updateFrutas(event) {
 function updateSorvetes(event) {
     const sorvetesCheckboxes = Array.from(document.querySelectorAll('input[name="sorvete"]:checked'));
     order.sorvetes = sorvetesCheckboxes.map(checkbox => checkbox.value);
-    
+    console.log('DEBUG updateSorvetes - order.sorvetes:', order.sorvetes);
+
     // Calcula sorvetes adicionais (acima de 1)
     order.extras.sorvetesAdicionais = Math.max(0, order.sorvetes.length - 1);
-    
+
     updateTotal();
     updateVisualHints();
     saveToLocalStorage();
@@ -153,22 +155,25 @@ function updateSorvetes(event) {
 // Atualiza a seleção de caldas
 function updateCaldas(event) {
     const caldasCheckboxes = Array.from(document.querySelectorAll('input[name="calda"]:checked'));
-    
+    console.log('DEBUG updateCaldas - caldasCheckboxes:', caldasCheckboxes);
+
     // Se está desmarcando, permite sempre
     if (event && !event.target.checked) {
         order.caldas = caldasCheckboxes.map(checkbox => checkbox.value);
+        console.log('DEBUG updateCaldas (deselect) - order.caldas:', order.caldas);
         updateTotal();
         saveToLocalStorage();
         return;
     }
-    
+
     // Se está marcando, verifica o limite
     if (order.caldas.length >= CONFIG.maxCaldas) {
         event.target.checked = false;
         return;
     }
-    
+
     order.caldas = caldasCheckboxes.map(checkbox => checkbox.value);
+    console.log('DEBUG updateCaldas (select) - order.caldas:', order.caldas);
     updateTotal();
     saveToLocalStorage();
 }
@@ -176,43 +181,25 @@ function updateCaldas(event) {
 // Atualiza outros complementos (não caldas)
 function updateToppings(event) {
     const topping = event.target.value;
-    
+    console.log('DEBUG updateToppings - topping:', topping, 'checked:', event.target.checked);
+
     // Se está desmarcando, permite sempre
     if (!event.target.checked) {
         order.toppings = order.toppings.filter(t => t !== topping);
+        console.log('DEBUG updateToppings (deselect) - order.toppings:', order.toppings);
         updateTotal();
         saveToLocalStorage();
         return;
     }
-    
-    // Filtra apenas acompanhamentos (não caldas)
-    const isCalda = ['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(topping);
-    
-    if (!isCalda) {
-        const acompanhamentosAtuais = order.toppings.filter(t => 
-            !['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(t)
-        );
-        
-        if (acompanhamentosAtuais.length >= CONFIG.maxToppings) {
-            event.target.checked = false;
-            return;
-        }
-    } else {
-        // Limita caldas a 2
-        const caldasAtuais = order.toppings.filter(t => 
-            ['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(t)
-        );
-        
-        if (caldasAtuais.length >= CONFIG.maxCaldas) {
-            event.target.checked = false;
-            return;
-        }
+
+    // Se está marcando, verifica o limite
+    if (order.toppings.length >= CONFIG.maxToppings) {
+        event.target.checked = false;
+        return;
     }
-    
-    if (!order.toppings.includes(topping)) {
-        order.toppings.push(topping);
-    }
-    
+
+    order.toppings.push(topping);
+    console.log('DEBUG updateToppings (select) - order.toppings:', order.toppings);
     updateTotal();
     saveToLocalStorage();
 }
