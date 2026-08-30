@@ -30,31 +30,27 @@
 
         <main>
             <div class="card">
-                <h2>Escolha o tamanho</h2>
+                <h2>Tamanho</h2>
                 <div class="options" id="sizes">
                     <button class="option-btn" data-size="200" data-price="10.00">
-                        <span>200ml</span>
+                        <span>200 ml</span>
                         <span>R$ 10,00</span>
                     </button>
                     <button class="option-btn" data-size="250" data-price="12.00">
-                        <span>250ml</span>
+                        <span>250 ml</span>
                         <span>R$ 12,00</span>
                     </button>
-                    <button class="option-btn active" data-size="300" data-price="14.00">
-                        <span>300ml</span>
+                    <button class="option-btn" data-size="300" data-price="14.00">
+                        <span>300 ml</span>
                         <span>R$ 14,00</span>
                     </button>
                     <button class="option-btn" data-size="400" data-price="16.00">
-                        <span>400ml</span>
+                        <span>400 ml</span>
                         <span>R$ 16,00</span>
                     </button>
                     <button class="option-btn" data-size="500" data-price="18.00">
-                        <span>500ml</span>
+                        <span>500 ml</span>
                         <span>R$ 18,00</span>
-                    </button>
-                    <button class="option-btn" data-size="barca" data-price="50.00">
-                        <span>Barca de Açaí</span>
-                        <span>R$ 50,00</span>
                     </button>
                 </div>
             </div>
@@ -62,49 +58,44 @@
             <div class="card">
                 <h2>Complementos</h2>
                 <div class="options" id="toppings">
-                    <h3>Frutas (opcional)</h3>
-                    <p class="category-info">Escolha à vontade! As 2 primeiras frutas são grátis e as extras custam R$1,00.</p>
-                    <label class="option-checkbox">
+                    <h3 style="display: none;">Frutas (opcional)</h3>
+                    <p class="category-info" style="display: none;">Escolha à vontade! As 2 primeiras frutas são grátis e as extras custam R$1,00.</p>
+                    <label class="option-checkbox" style="display: none;">
                         <input type="checkbox" name="fruta" value="Banana" data-price="0.00">
                         <span>Banana</span>
                     </label>
-                    <label class="option-checkbox">
+                    <label class="option-checkbox" style="display: none;">
                         <input type="checkbox" name="fruta" value="Uva" data-price="0.00">
                         <span>Uva</span>
                     </label>
-                    <label class="option-checkbox">
+                    <label class="option-checkbox" style="display: none;">
                         <input type="checkbox" name="fruta" value="Morango" data-price="0.00">
                         <span>Morango</span>
                     </label>
 
-                    <h3>Sorvetes (opcional)</h3>
-                    <p class="category-info">Um já incluso. Cada sorvete extra tem acréscimo de R$2,00.</p>
+                    <h3>Sorvetes</h3>
                     <label class="option-checkbox">
-                        <input type="checkbox" name="sorvete" value="Chocolate" data-price="0.00">
-                        <span>Chocolate</span>
+                        <input type="checkbox" name="sorvete" value="Creme com passas" data-price="0.00">
+                        <span>Creme com passas</span>
                     </label>
                     <label class="option-checkbox">
                         <input type="checkbox" name="sorvete" value="Morango" data-price="0.00">
                         <span>Morango</span>
                     </label>
-                    <label class="option-checkbox">
-                        <input type="checkbox" name="sorvete" value="Creme" data-price="0.00">
-                        <span>Creme</span>
-                    </label>
 
-                    <h3>Complementos</h3>
-                    <p class="category-info">Pode escolher tudo o que quiser para montar do seu jeito.</p>
+                    <h3>Acompanhamentos</h3>
+                    <p class="category-info">( escolha até 3 )</p>
                     <label class="option-checkbox">
-                        <input type="checkbox" name="topping" value="Leite em Pó" data-price="0.00">
-                        <span>Leite em Pó</span>
+                        <input type="checkbox" name="topping" value="Leite em pó" data-price="0.00">
+                        <span>Leite em pó</span>
                     </label>
                     <label class="option-checkbox">
                         <input type="checkbox" name="topping" value="Granola" data-price="0.00">
                         <span>Granola</span>
                     </label>
                     <label class="option-checkbox">
-                        <input type="checkbox" name="topping" value="MeM's" data-price="0.00">
-                        <span>MeM's</span>
+                        <input type="checkbox" name="topping" value="Paçoca" data-price="0.00">
+                        <span>Paçoca</span>
                     </label>
                     <label class="option-checkbox">
                         <input type="checkbox" name="topping" value="Amendoim" data-price="0.00">
@@ -119,23 +110,30 @@
                         <span>Cereal</span>
                     </label>
                     <label class="option-checkbox">
-                        <input type="checkbox" name="topping" value="Paçoca" data-price="0.00">
-                        <span>Paçoca</span>
+                        <input type="checkbox" name="topping" value="MM'S" data-price="0.00">
+                        <span>MM'S</span>
                     </label>
 
                     <h3>Caldas</h3>
-                    <p class="category-info">Escolha apenas uma calda.</p>
                     <label class="option-checkbox">
-                        <input type="checkbox" name="topping" value="Leite Condensado" data-price="0.00">
-                        <span>Leite Condensado</span>
+                        <input type="checkbox" name="topping" value="Leite condensado" data-price="0.00">
+                        <span>Leite condensado</span>
                     </label>
                     <label class="option-checkbox">
-                        <input type="checkbox" name="topping" value="Calda de Chocolate" data-price="0.00">
-                        <span>Calda de Chocolate</span>
+                        <input type="checkbox" name="topping" value="Chocolate" data-price="0.00">
+                        <span>Chocolate</span>
                     </label>
                     <label class="option-checkbox">
-                        <input type="checkbox" name="topping" value="Calda de Morango" data-price="0.00">
-                        <span>Calda de Morango</span>
+                        <input type="checkbox" name="topping" value="Morango" data-price="0.00">
+                        <span>Morango</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="topping" value="Uva" data-price="0.00">
+                        <span>Uva</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="topping" value="Babalu" data-price="0.00">
+                        <span>Babalu</span>
                     </label>
                 </div>
             </div>

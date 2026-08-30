@@ -21,7 +21,7 @@ const cancelButton = document.getElementById('cancel-btn');
 // Estado do pedido
 let order = {
     size: {
-        name: '300ml',
+        name: '300 ml',
         price: 14.00
     },
     frutas: [],
@@ -37,7 +37,7 @@ let order = {
     },
     payment: {
         method: null,
-        trocoPara: null
+        valorPago: null
     }
 };
 
@@ -79,13 +79,17 @@ function setupEventListeners() {
         checkbox.addEventListener('change', updateSorvetes);
     });
 
+    // Seleção de toppings (acompanhamentos) com limite de 3
+    document.querySelectorAll('input[name="topping"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateToppings);
+    });
+
     // Seleção de caldas (apenas uma seleção permitida)
     const caldas = document.querySelectorAll('input[name="topping"][value^="Calda"], input[name="topping"][value^="Leite Condensado"]');
     caldas.forEach(calda => {
         calda.addEventListener('change', updateCaldas);
     });
 
-    // Outros complementos
     document.querySelectorAll('input[name="topping"]:not([value^="Calda"]):not([value^="Leite Condensado"])').forEach(checkbox => {
         checkbox.addEventListener('change', updateToppings);
     });
@@ -178,6 +182,21 @@ function updateCaldas(event) {
 // Atualiza outros complementos (não caldas)
 function updateToppings(event) {
     const topping = event.target.value;
+    
+    // Filtra apenas acompanhamentos (não caldas)
+    const isCalda = ['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(topping);
+    
+    if (!isCalda) {
+        const acompanhamentosAtuais = order.toppings.filter(t => 
+            !['Leite condensado', 'Chocolate', 'Morango', 'Uva', 'Babalu'].includes(t)
+        );
+        
+        if (event.target.checked && acompanhamentosAtuais.length >= CONFIG.limits.maxToppings) {
+            event.target.checked = false;
+            alert(`Você pode escolher até ${CONFIG.limits.maxToppings} acompanhamentos.`);
+            return;
+        }
+    }
     
     if (event.target.checked) {
         if (!order.toppings.includes(topping)) {
